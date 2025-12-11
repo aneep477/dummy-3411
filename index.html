@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem MPU3411 Pro (V5 - Dashboard Fix)</title>
+    <title>Sistem MPU3411 Pro (V6 - Final UI)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -13,19 +13,31 @@
         .main-content-area { padding-top: 130px; padding-bottom: 40px; min-height: 100vh; }
         .content-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        /* Loader & Toast */
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.95); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 10px; }
         .toast { min-width: 300px; padding: 16px; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.3s ease-out; display: flex; align-items: center; }
         .toast.show { transform: translateX(0); }
         .toast.success { background-color: #10b981; }
         .toast.error { background-color: #ef4444; }
+
+        /* Login Background (Style Pilihan Tuan) */
         .login-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); position: relative; overflow: hidden; }
+        .login-bg::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); animation: rotate 20s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Table Styling */
         .styled-table thead tr { background-color: #1e293b; color: #ffffff; text-align: left; }
         .styled-table th, .styled-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
         .styled-table tbody tr:nth-of-type(even) { background-color: #f8fafc; }
+        
+        /* Rubric Modal Styling */
         .rubric-modal { transition: opacity 0.3s ease; }
         .rubric-modal.hidden { opacity: 0; pointer-events: none; }
         .rubric-modal:not(.hidden) { opacity: 1; pointer-events: auto; }
@@ -44,7 +56,158 @@
         <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-4"></div>
         <p id="loader-text" class="text-gray-700 font-bold animate-pulse">Sedang memproses...</p>
     </div>
+
     <div id="toast-container"></div>
+
+    <div id="login-view" class="fixed inset-0 login-bg z-[60] flex items-center justify-center p-4">
+        <div class="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-yellow-500 relative z-10">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4">
+                    <i class="fas fa-graduation-cap text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold text-slate-800">MPU3411</h1>
+                <p class="text-slate-500 font-medium">Sistem Pengurusan Markah Kokurikulum Olahraga 2026</p>
+            </div>
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Emel Rasmi</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-400"><i class="fas fa-envelope"></i></span>
+                        <input type="email" id="email" class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="nama@organisasi.com" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Kata Laluan</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-400"><i class="fas fa-lock"></i></span>
+                        <input type="password" id="password" class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg transition transform hover:scale-[1.02]">LOG MASUK</button>
+            </form>
+            <p class="text-xs text-center text-gray-400 mt-6">Versi 6.0 | hanifffaizal2026</p>
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden">
+        <header class="fixed-header bg-slate-900 text-white shadow-xl flex flex-col justify-center">
+            <div class="px-6 flex justify-between items-center h-full max-w-7xl mx-auto w-full">
+                <div class="flex items-center gap-3">
+                    <div class="bg-yellow-700 text-slate-900 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl">M</div>
+                    <div><h1 class="text-xl font-bold">MPU3411 KOKURIKULUM OLAHRAGA</h1><p class="text-xs text-slate-700">Pengguna: <span id="user-display-name">...</span> | <span id="user-role-display">...</span></p></div>
+                </div>
+                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2"><i class="fas fa-sign-out-alt"></i>KELUAR</button>
+            </div>
+        </header>
+
+        <div class="fixed top-[70px] left-0 right-0 bg-white z-40 border-b shadow-sm">
+            <nav class="flex px-4 py-2 space-x-2 overflow-x-auto max-w-7xl mx-auto">
+                <button onclick="nav('dashboard')" id="btn-dashboard" class="nav-btn active px-4 py-2 rounded-lg text-sm font-bold bg-blue-100 text-blue-700 transition">Dashboard</button>
+                <button onclick="nav('ujian')" id="btn-ujian" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">Ujian (30%)</button>
+                <button onclick="nav('hp3')" id="btn-hp3" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">Amali HP3 (50%)</button>
+                <button onclick="nav('hp7')" id="btn-hp7" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">HP7 (20%)</button>
+            </nav>
+        </div>
+
+        <div class="main-content-area max-w-7xl mx-auto px-4">
+            
+            <section id="dashboard" class="content-section block">
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg mb-6 text-sm flex items-center gap-2">
+                    <i class="fas fa-info-circle"></i> <span>Data dipaparkan untuk kelas: <span id="user-class-badge" class="font-bold underline">...</span></span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white p-5 rounded-xl border shadow-sm"><h3 class="text-xs font-bold text-slate-500">JUMLAH PELAJAR</h3><p class="text-3xl font-extrabold mt-2" id="dash-total">0</p></div>
+                    <div class="bg-white p-5 rounded-xl border shadow-sm border-blue-100"><h3 class="text-xs font-bold text-blue-600">UJIAN SELESAI</h3><p class="text-3xl font-extrabold text-blue-700 mt-2" id="dash-ujian">0</p></div>
+                    <div class="bg-white p-5 rounded-xl border shadow-sm border-green-100"><h3 class="text-xs font-bold text-green-600">HP3 SELESAI</h3><p class="text-3xl font-extrabold text-green-700 mt-2" id="dash-hp3">0</p></div>
+                    <div class="bg-white p-5 rounded-xl border shadow-sm border-yellow-100"><h3 class="text-xs font-bold text-yellow-600">HP7 SELESAI</h3><p class="text-3xl font-extrabold text-yellow-700 mt-2" id="dash-hp7">0</p></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800">Ringkasan Prestasi</h3>
+                        <select id="dash-filter-class" onchange="renderDashboardTable()" class="text-xs p-2 border rounded font-semibold focus:outline-none"></select>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full styled-table text-sm">
+                            <thead><tr><th>Nama Pelajar</th><th>Kelas</th><th class="text-center">Ujian (30%)</th><th class="text-center">HP3 (50%)</th><th class="text-center">HP7 (20%)</th><th class="text-center">Jumlah</th><th class="text-center">Status</th></tr></thead>
+                            <tbody id="dashboard-table-body"><tr><td colspan="7" class="text-center py-4 text-gray-500">Memuatkan data...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ujian" class="content-section">
+                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center"><i class="fas fa-file-alt text-blue-600 mr-2"></i> Ujian (30%)</h2>
+                    <form id="form-ujian" onsubmit="handleFormSubmit(event, 'MARKAH_UJIAN')">
+                        <div class="bg-blue-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-ujian" onchange="filterStudents('ujian')" class="w-full p-2 border rounded"></select></div>
+                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-ujian" onkeyup="searchDropdown('ujian')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-ujian" onchange="loadStudentData('ujian')" class="w-full p-2 border rounded" disabled></select></div>
+                            <div class="md:col-span-2"><input type="text" id="name-ujian" class="w-full p-2 bg-gray-100 border rounded font-bold" readonly><input type="hidden" name="ID_SISTEM" id="id-ujian"><input type="hidden" name="Nama_Pelajar" id="hidden-name-ujian"><input type="hidden" name="Kelas" id="class-ujian"></div>
+                        </div>
+                        <div class="grid grid-cols-5 gap-2 mb-4">
+                            <div><label class="text-xs font-bold block mb-1">S1(a) [5]</label><input type="number" name="S1A_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
+                            <div><label class="text-xs font-bold block mb-1">S1(b) [5]</label><input type="number" name="S1B_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
+                            <div><label class="text-xs font-bold block mb-1">S2(a) [5]</label><input type="number" name="S2A_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
+                            <div><label class="text-xs font-bold block mb-1">S2(b) [5]</label><input type="number" name="S2B_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
+                            <div><label class="text-xs font-bold block mb-1">S1(c) [10]</label><input type="number" name="S1C_Markah" class="score-in w-full border p-2 text-center" max="10"></div>
+                        </div>
+                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-ujian" class="text-blue-600 text-xl">0</span> / 30</div><input type="hidden" name="Jumlah_Ujian" id="val-total-ujian"><button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
+                    </form>
+                </div>
+            </section>
+
+            <section id="hp3" class="content-section">
+                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
+                    <div class="flex justify-between items-center border-b pb-4 mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800 flex items-center"><i class="fas fa-running text-green-600 mr-2"></i> Amali HP3 (50%)</h2>
+                        <button onclick="toggleRubric(true)" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-700"><i class="fas fa-list-alt mr-1"></i> LIHAT RUBRIK</button>
+                    </div>
+                    <form id="form-hp3" onsubmit="handleFormSubmit(event, 'MARKAH_AMALI_HP3')">
+                        <div class="bg-green-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-hp3" onchange="filterStudents('hp3')" class="w-full p-2 border rounded"></select></div>
+                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-hp3" onkeyup="searchDropdown('hp3')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-hp3" onchange="loadStudentData('hp3')" class="w-full p-2 border rounded" disabled></select></div>
+                            <div class="md:col-span-2"><input type="text" id="name-hp3" class="w-full p-2 bg-gray-100 border rounded font-bold" readonly><input type="hidden" name="ID_SISTEM" id="id-hp3"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp3"><input type="hidden" name="Kelas" id="class-hp3"></div>
+                        </div>
+                        <div class="mb-4"><h3 class="bg-green-100 px-2 py-1 text-xs font-bold rounded inline-block mb-2">Balapan</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div><label class="text-xs block">Permulaan [10]</label><input type="number" name="HP3_Permulaan_10" class="score-in-hp3 w-full border p-2 text-center" max="10"></div>
+                                <div><label class="text-xs block">Larian [10]</label><input type="number" name="HP3_Larian_10" class="score-in-hp3 w-full border p-2 text-center" max="10"></div>
+                                <div><label class="text-xs block">Penamat [5]</label><input type="number" name="HP3_Penamat_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
+                            </div>
+                        </div>
+                        <div class="mb-4"><h3 class="bg-green-100 px-2 py-1 text-xs font-bold rounded inline-block mb-2">Padang</h3>
+                            <div class="grid grid-cols-4 gap-2">
+                                <div><label class="text-xs block">Sedia [5]</label><input type="number" name="HP3_Persediaan_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
+                                <div><label class="text-xs block">Lungsur [5]</label><input type="number" name="HP3_Lungsuran_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
+                                <div><label class="text-xs block">Lontar [10]</label><input type="number" name="HP3_Lontaran_10" class="score-in-hp3 w-full border p-2 text-center" max="10"></div>
+                                <div><label class="text-xs block">Pulih [5]</label><input type="number" name="HP3_Pulihan_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-hp3" class="text-green-600 text-xl">0</span> / 50</div><input type="hidden" name="Jumlah_HP3" id="val-total-hp3"><button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
+                    </form>
+                </div>
+            </section>
+
+            <section id="hp7" class="content-section">
+                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center"><i class="fas fa-tools text-yellow-600 mr-2"></i> HP7 (20%)</h2>
+                    <form id="form-hp7" onsubmit="handleFormSubmit(event, 'MARKAH_HP7')">
+                        <div class="bg-yellow-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-hp7" onchange="filterStudents('hp7')" class="w-full p-2 border rounded"></select></div>
+                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-hp7" onkeyup="searchDropdown('hp7')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-hp7" onchange="loadStudentData('hp7')" class="w-full p-2 border rounded" disabled></select></div>
+                            <div class="md:col-span-2"><input type="text" id="name-hp7" class="w-full p-2 bg-gray-100 border rounded font-bold" readonly><input type="hidden" name="ID_SISTEM" id="id-hp7"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp7"><input type="hidden" name="Kelas" id="class-hp7"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div><label class="text-xs font-bold block mb-1">Penyediaan Trek [10]</label><input type="number" name="HP7_Penyediaan_Trek_10" class="score-in-hp7 w-full border p-2 text-center" max="10"></div>
+                            <div><label class="text-xs font-bold block mb-1">Penyediaan Sektor [10]</label><input type="number" name="HP7_Penyediaan_Sektor_10" class="score-in-hp7 w-full border p-2 text-center" max="10"></div>
+                        </div>
+                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-hp7" class="text-yellow-600 text-xl">0</span> / 20</div><input type="hidden" name="Jumlah_HP7" id="val-total-hp7"><button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
+                    </form>
+                </div>
+            </section>
+
+        </div>
+    </div>
 
     <div id="rubric-modal" class="rubric-modal hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
@@ -94,138 +257,6 @@
         </div>
     </div>
 
-    <div id="login-view" class="fixed inset-0 login-bg z-[60] flex items-center justify-center p-4">
-        <div class="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-yellow-500 relative z-10">
-            <h1 class="text-3xl font-extrabold text-slate-800 text-center mb-2">MPU3411</h1>
-            <p class="text-slate-500 font-medium text-center mb-8">Sistem Pengurusan Markah Kokurikulum Olahraga 2026</p>
-            <form id="login-form" class="space-y-5">
-                <div><label class="block text-sm font-bold text-slate-700 mb-1">Emel Rasmi</label><input type="email" id="email" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required></div>
-                <div><label class="block text-sm font-bold text-slate-700 mb-1">Kata Laluan</label><input type="password" id="password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required></div>
-                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg">LOG MASUK</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="app-container" class="hidden">
-        <header class="fixed-header bg-slate-900 text-white shadow-xl flex flex-col justify-center">
-            <div class="px-6 flex justify-between items-center h-full max-w-7xl mx-auto w-full">
-                <div class="flex items-center gap-3">
-                    <div class="bg-yellow-500 text-slate-900 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl">M</div>
-                    <div><h1 class="text-xl font-bold">MPU3411 OLAHRAGA IPGKDA</h1><p class="text-xs text-slate-600">Pengguna: <span id="user-display-name">...</span> | <span id="user-role-display">...</span></p></div>
-                </div>
-                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold">KELUAR</button>
-            </div>
-        </header>
-
-        <div class="fixed top-[70px] left-0 right-0 bg-white z-40 border-b shadow-sm">
-            <nav class="flex px-4 py-2 space-x-2 overflow-x-auto max-w-7xl mx-auto">
-                <button onclick="nav('dashboard')" id="btn-dashboard" class="nav-btn active px-4 py-2 rounded-lg text-sm font-bold bg-blue-100 text-blue-700 transition">Dashboard</button>
-                <button onclick="nav('ujian')" id="btn-ujian" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">Ujian (30%)</button>
-                <button onclick="nav('hp3')" id="btn-hp3" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">Amali HP3 (50%)</button>
-                <button onclick="nav('hp7')" id="btn-hp7" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">HP7 (20%)</button>
-            </nav>
-        </div>
-
-        <div class="main-content-area max-w-7xl mx-auto px-4">
-            
-            <section id="dashboard" class="content-section block">
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg mb-6 text-sm">
-                    <strong>Info:</strong> Data dipaparkan untuk kelas: <span id="user-class-badge" class="font-bold underline">...</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white p-5 rounded-xl border shadow-sm"><h3 class="text-xs font-bold text-slate-500">JUMLAH PELAJAR</h3><p class="text-3xl font-extrabold mt-2" id="dash-total">0</p></div>
-                    <div class="bg-white p-5 rounded-xl border shadow-sm border-blue-100"><h3 class="text-xs font-bold text-blue-600">UJIAN SELESAI</h3><p class="text-3xl font-extrabold text-blue-700 mt-2" id="dash-ujian">0</p></div>
-                    <div class="bg-white p-5 rounded-xl border shadow-sm border-green-100"><h3 class="text-xs font-bold text-green-600">HP3 SELESAI</h3><p class="text-3xl font-extrabold text-green-700 mt-2" id="dash-hp3">0</p></div>
-                    <div class="bg-white p-5 rounded-xl border shadow-sm border-yellow-100"><h3 class="text-xs font-bold text-yellow-600">HP7 SELESAI</h3><p class="text-3xl font-extrabold text-yellow-700 mt-2" id="dash-hp7">0</p></div>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
-                        <h3 class="font-bold text-gray-800">Ringkasan Prestasi</h3>
-                        <select id="dash-filter-class" onchange="renderDashboardTable()" class="text-xs p-2 border rounded font-semibold focus:outline-none"></select>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full styled-table text-sm">
-                            <thead><tr><th>Nama Pelajar</th><th>Kelas</th><th class="text-center">Ujian (30%)</th><th class="text-center">HP3 (50%)</th><th class="text-center">HP7 (20%)</th><th class="text-center">Jumlah</th><th class="text-center">Status</th></tr></thead>
-                            <tbody id="dashboard-table-body"><tr><td colspan="7" class="text-center py-4 text-gray-500">Memuatkan data...</td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <section id="ujian" class="content-section">
-                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center"><i class="fas fa-file-alt text-blue-600 mr-2"></i> Ujian (30%)</h2>
-                    <form id="form-ujian" onsubmit="handleFormSubmit(event, 'MARKAH_UJIAN')">
-                        <div class="bg-blue-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-ujian" onchange="filterStudents('ujian')" class="w-full p-2 border rounded"></select></div>
-                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-ujian" onkeyup="searchDropdown('ujian')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-ujian" onchange="loadStudentData('ujian')" class="w-full p-2 border rounded" disabled></select></div>
-                            <div class="md:col-span-2"><input type="text" id="name-ujian" class="w-full p-2 bg-gray-100 border rounded font-bold" readonly><input type="hidden" name="ID_SISTEM" id="id-ujian"><input type="hidden" name="Nama_Pelajar" id="hidden-name-ujian"><input type="hidden" name="Kelas" id="class-ujian"></div>
-                        </div>
-                        <div class="grid grid-cols-5 gap-2 mb-4">
-                            <div><label class="text-xs font-bold block mb-1">S1(a) [5]</label><input type="number" name="S1A_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
-                            <div><label class="text-xs font-bold block mb-1">S1(b) [5]</label><input type="number" name="S1B_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
-                            <div><label class="text-xs font-bold block mb-1">S2(a) [5]</label><input type="number" name="S2A_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
-                            <div><label class="text-xs font-bold block mb-1">S2(b) [5]</label><input type="number" name="S2B_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
-                            <div><label class="text-xs font-bold block mb-1">S1(c) [10]</label><input type="number" name="S1C_Markah" class="score-in w-full border p-2 text-center" max="10"></div>
-                        </div>
-                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-ujian" class="text-blue-600 text-xl">0</span> / 30</div><input type="hidden" name="Jumlah_Ujian" id="val-total-ujian"><button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
-                    </form>
-                </div>
-            </section>
-
-            <section id="hp3" class="content-section">
-                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
-                    <div class="flex justify-between items-center border-b pb-4 mb-6">
-                        <h2 class="text-2xl font-bold text-slate-800 flex items-center"><i class="fas fa-running text-green-600 mr-2"></i> Amali HP3 (50%)</h2>
-                        <button onclick="toggleRubric(true)" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-700">LIHAT RUBRIK</button>
-                    </div>
-                    <form id="form-hp3" onsubmit="handleFormSubmit(event, 'MARKAH_AMALI_HP3')">
-                        <div class="bg-green-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-hp3" onchange="filterStudents('hp3')" class="w-full p-2 border rounded"></select></div>
-                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-hp3" onkeyup="searchDropdown('hp3')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-hp3" onchange="loadStudentData('hp3')" class="w-full p-2 border rounded" disabled></select></div>
-                            <div class="md:col-span-2"><input type="text" id="name-hp3" class="w-full p-2 bg-gray-100 border rounded font-bold" readonly><input type="hidden" name="ID_SISTEM" id="id-hp3"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp3"><input type="hidden" name="Kelas" id="class-hp3"></div>
-                        </div>
-                        <div class="mb-4"><h3 class="bg-green-100 px-2 py-1 text-xs font-bold rounded inline-block mb-2">Balapan</h3>
-                            <div class="grid grid-cols-3 gap-2">
-                                <div><label class="text-xs block">Permulaan [10]</label><input type="number" name="HP3_Permulaan_10" class="score-in-hp3 w-full border p-2 text-center" max="10"></div>
-                                <div><label class="text-xs block">Larian [10]</label><input type="number" name="HP3_Larian_10" class="score-in-hp3 w-full border p-2 text-center" max="10"></div>
-                                <div><label class="text-xs block">Penamat [5]</label><input type="number" name="HP3_Penamat_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
-                            </div>
-                        </div>
-                        <div class="mb-4"><h3 class="bg-green-100 px-2 py-1 text-xs font-bold rounded inline-block mb-2">Padang</h3>
-                            <div class="grid grid-cols-4 gap-2">
-                                <div><label class="text-xs block">Sedia [5]</label><input type="number" name="HP3_Persediaan_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
-                                <div><label class="text-xs block">Lungsur [5]</label><input type="number" name="HP3_Lungsuran_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
-                                <div><label class="text-xs block">Lontar [10]</label><input type="number" name="HP3_Lontaran_10" class="score-in-hp3 w-full border p-2 text-center" max="10"></div>
-                                <div><label class="text-xs block">Pulih [5]</label><input type="number" name="HP3_Pulihan_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-hp3" class="text-green-600 text-xl">0</span> / 50</div><input type="hidden" name="Jumlah_HP3" id="val-total-hp3"><button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
-                    </form>
-                </div>
-            </section>
-
-            <section id="hp7" class="content-section">
-                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center"><i class="fas fa-tools text-yellow-600 mr-2"></i> HP7 (20%)</h2>
-                    <form id="form-hp7" onsubmit="handleFormSubmit(event, 'MARKAH_HP7')">
-                        <div class="bg-yellow-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-hp7" onchange="filterStudents('hp7')" class="w-full p-2 border rounded"></select></div>
-                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-hp7" onkeyup="searchDropdown('hp7')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-hp7" onchange="loadStudentData('hp7')" class="w-full p-2 border rounded" disabled></select></div>
-                            <div class="md:col-span-2"><input type="text" id="name-hp7" class="w-full p-2 bg-gray-100 border rounded font-bold" readonly><input type="hidden" name="ID_SISTEM" id="id-hp7"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp7"><input type="hidden" name="Kelas" id="class-hp7"></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div><label class="text-xs font-bold block mb-1">Penyediaan Trek [10]</label><input type="number" name="HP7_Penyediaan_Trek_10" class="score-in-hp7 w-full border p-2 text-center" max="10"></div>
-                            <div><label class="text-xs font-bold block mb-1">Penyediaan Sektor [10]</label><input type="number" name="HP7_Penyediaan_Sektor_10" class="score-in-hp7 w-full border p-2 text-center" max="10"></div>
-                        </div>
-                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-hp7" class="text-yellow-600 text-xl">0</span> / 20</div><input type="hidden" name="Jumlah_HP7" id="val-total-hp7"><button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
-                    </form>
-                </div>
-            </section>
-
-        </div>
-    </div>
-
     <script>
         // ============================================
         // PASTE URL ANDA DI SINI
@@ -237,19 +268,16 @@
         let existingScores = {};
         let filteredStudentsCache = [];
 
-        // --- DATA NORMALIZER (Fix undefined/case mismatch) ---
+        // --- DATA NORMALIZER ---
         function normalizeData(students) {
             return students.map(s => {
-                // Cari key yang mungkin berbeza (Case Sensitive: Kelas vs KELAS)
                 const kelas = s.Kelas || s.KELAS || s.kelas || "TIADA KELAS";
                 const nama = s.Nama_Pelajar || s.NAMA_PELAJAR || s.Nama || "TIADA NAMA";
                 const id = s.ID_SISTEM || s.ID || s.id_sistem || "";
-                
                 return { ...s, Kelas: kelas.toString().trim(), Nama_Pelajar: nama, ID_SISTEM: id };
             });
         }
 
-        // --- HELPER UNTUK BERSIHKAN DATA NOMBOR (ANTI-CRASH) ---
         function cleanNumber(val) {
             if (val === "#N/A" || val === "" || val === null || val === undefined) return 0;
             const num = parseFloat(val);
@@ -286,7 +314,6 @@
             fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email: document.getElementById('email').value.trim(), password: document.getElementById('password').value.trim() }) })
             .then(res => res.json()).then(data => {
                 if (data.result === 'success') { 
-                    // Normalize user class data just in case
                     currentUser = { ...data.user, kelas: (data.user.kelas || "ALL").toString().trim() }; 
                     initApp(); 
                 } else { showToast(data.message, 'error'); showLoader(false); }
@@ -306,10 +333,8 @@
             fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'get_data', email: currentUser.email, role: currentUser.role }) })
             .then(res => res.json()).then(data => {
                 if(data.result === 'success'){
-                    // Normalize data here to prevent "undefined" error
                     allStudents = normalizeData(data.data.students); 
                     existingScores = data.data.scores;
-                    console.log("Data loaded:", allStudents); // Debug log
                     updateDashboard(); 
                     initDropdowns('ujian'); initDropdowns('hp3'); initDropdowns('hp7');
                 } else { showToast(data.message, 'error'); }
@@ -323,7 +348,6 @@
             let targetStudents = allStudents;
             const assignedClass = currentUser.kelas;
             
-            // Filter logic yang lebih robust
             if (currentUser.role === 'PENSYARAH' || (assignedClass && assignedClass !== 'ALL')) {
                 targetStudents = allStudents.filter(s => s.Kelas === assignedClass);
             }
@@ -363,7 +387,7 @@
             let studentsToRender = (filterClass !== 'all') ? allStudents.filter(s => s.Kelas === filterClass) : allStudents;
 
             if(studentsToRender.length === 0) { 
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 font-bold">Tiada pelajar dijumpai. (Semak Nama Kelas di Google Sheet)</td></tr>'; 
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 font-bold">Tiada pelajar dijumpai.</td></tr>'; 
                 return; 
             }
 
@@ -375,7 +399,6 @@
 
                 const getSum = (arr, indices) => indices.reduce((acc, idx) => acc + cleanNumber(arr[idx]), 0).toFixed(1);
 
-                // Index arrays based on column positions (Adjust if needed)
                 const valUjian = sUjian ? getSum(sUjian, [5,6,7,8,9]) : '-';
                 const valHP3 = sHP3 ? getSum(sHP3, [5,6,7,8,9,10,11]) : '-';
                 const valHP7 = sHP7 ? getSum(sHP7, [5,6]) : '-';
