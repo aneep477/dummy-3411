@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem MPU3411 Pro (V6 - Final UI)</title>
+    <title>Sistem MPU3411 Pro (V7 - Full Rubric)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -13,36 +13,24 @@
         .main-content-area { padding-top: 130px; padding-bottom: 40px; min-height: 100vh; }
         .content-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        
-        /* Loader & Toast */
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.95); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 10px; }
         .toast { min-width: 300px; padding: 16px; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.3s ease-out; display: flex; align-items: center; }
         .toast.show { transform: translateX(0); }
         .toast.success { background-color: #10b981; }
         .toast.error { background-color: #ef4444; }
-
-        /* Login Background (Style Pilihan Tuan) */
         .login-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); position: relative; overflow: hidden; }
-        .login-bg::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); animation: rotate 20s linear infinite; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* Table Styling */
         .styled-table thead tr { background-color: #1e293b; color: #ffffff; text-align: left; }
         .styled-table th, .styled-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
         .styled-table tbody tr:nth-of-type(even) { background-color: #f8fafc; }
-        
-        /* Rubric Modal Styling */
         .rubric-modal { transition: opacity 0.3s ease; }
         .rubric-modal.hidden { opacity: 0; pointer-events: none; }
         .rubric-modal:not(.hidden) { opacity: 1; pointer-events: auto; }
-        .rubric-table th { background-color: #e2e8f0; border: 1px solid #cbd5e1; }
-        .rubric-table td { border: 1px solid #e2e8f0; vertical-align: top; padding: 8px; font-size: 0.85rem; }
+        .rubric-table th { background-color: #e2e8f0; border: 1px solid #cbd5e1; padding: 10px; }
+        .rubric-table td { border: 1px solid #e2e8f0; vertical-align: top; padding: 10px; font-size: 0.85rem; }
         .bg-level-5 { background-color: #d1fae5; } 
         .bg-level-4 { background-color: #dbeafe; } 
         .bg-level-3 { background-color: #e0f2fe; } 
@@ -56,8 +44,122 @@
         <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-4"></div>
         <p id="loader-text" class="text-gray-700 font-bold animate-pulse">Sedang memproses...</p>
     </div>
-
     <div id="toast-container"></div>
+
+    <div id="rubric-modal" class="rubric-modal hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
+            <div class="bg-green-700 text-white p-4 flex justify-between items-center shrink-0">
+                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-book-open"></i> Rubrik Amali HP3 (Terperinci 5 Peringkat)</h3>
+                <button onclick="toggleRubric(false)" class="hover:bg-green-600 p-2 rounded-full transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="flex border-b bg-gray-50 shrink-0">
+                <button onclick="switchRubricTab('balapan')" id="tab-btn-balapan" class="flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white hover:bg-gray-50 transition"><i class="fas fa-stopwatch mr-2"></i> ACARA BALAPAN</button>
+                <button onclick="switchRubricTab('padang')" id="tab-btn-padang" class="flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition"><i class="fas fa-dot-circle mr-2"></i> ACARA PADANG</button>
+            </div>
+            <div class="p-5 overflow-y-auto bg-gray-50 flex-1">
+                
+                <div id="rubric-content-balapan" class="block space-y-8">
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Permulaan (10%)</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria (Persediaan, Ke Garisan, Sedia)</th></tr></thead>
+                            <tbody>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Memasang blok betul tanpa bantuan. Langkah pantas ke garisan. Posisi dekam & tangan tepat. Punggung tinggi dari kepala, berat ke hadapan, kaki bersudut, kepala tunduk relaks.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Memasang blok betul. Melangkah ke garisan. Posisi dekam betul. Punggung tidak begitu tinggi, berat ke hadapan, kepala tunduk.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Memasang blok hampir betul. Kurang bersedia. Posisi dekam kesalahan minima. Punggung sama aras kepala, berat ke hadapan.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Memasang blok kesalahan kecil/bantuan. Lambat ke garisan. Punggung kurang tinggi, kepala tidak relaks. Teknik kurang betul.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Memasang blok bantuan penuh. Teragak-agak. Posisi salah. Punggung tidak tinggi. Banyak kelemahan.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Larian (10%)</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria (Mula, Tolakan, Koordinasi)</th></tr></thead>
+                            <tbody>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Masa tindak balas amat pantas. Tolakan maksimum tanpa lonjakan. Koordinasi tangan/kaki selaras. Ayunan optimum. Teknik mula betul tanpa bantuan.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Masa tindak balas pantas. Tolakan maksimum sedikit melonjak. Koordinasi betul. Ayunan tangan maksimum. Teknik mula betul bantuan minima.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Masa tindak balas agak pantas. Tolakan agak maksimum. Koordinasi agak betul. Ayunan agak maksimum.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Masa tindak balas kurang pantas. Tolakan kurang maksimum. Koordinasi kurang sempurna. Ayunan kurang maksimum.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Masa tindak balas lambat. Tiada tolakan. Tiada koordinasi. Ayunan minimum.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Penamat (5%)</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria (Torso, Dipping, Kekal Laju)</th></tr></thead>
+                            <tbody>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Melintasi dengan 'Torso'. Dipping tangan ke belakang tekal. Kekalkan kepantasan & imbangan. Teknik betul tanpa bantuan.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Melintasi dengan 'Torso'. Dipping tangan ke belakang. Kekalkan kepantasan & imbangan. Teknik betul.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Melintasi dengan 'Torso'. Dipping tangan dihayun. Agak mengekalkan kepantasan & imbangan.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Melintasi garisan. Dipping tanpa tangan dihayun. Tidak mengekalkan kepantasan. Teknik kurang betul.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Berhenti serta merta. Tidak membuat dipping. Tidak kekal kepantasan. Banyak kelemahan.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="rubric-content-padang" class="hidden space-y-8">
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Persediaan (5%)</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria (Pegangan, Kedudukan)</th></tr></thead>
+                            <tbody>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Peluru tidak sentuh tapak tangan (pangkal 3/5 jari). Sentuh sisi leher/bawah telinga. Berdiri membelakangkan kawasan. Teknik tepat.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Peluru tidak sentuh tapak tangan. Sentuh sisi leher. Berdiri membelakangkan kawasan. Teknik betul.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Peluru tidak sentuh tapak tangan. Kedudukan peluru <strong>tidak</strong> menyentuh sisi leher dengan tepat. Teknik betul perlu dibaiki.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Peluru tidak sentuh tapak tangan. Tidak memegang di pangkal jari. Kedudukan peluru salah. Tidak membelakangkan kawasan.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Teknik pegangan dan persediaan salah sepenuhnya.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Lungsuran (5%)</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria (Pergerakan Kaki)</th></tr></thead>
+                            <tbody>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Lungsur kedua kaki serentak. Kaki dalam bulatan. Lungsuran pantas dan licin. Teknik betul dan tepat.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Lungsur serentak. Kaki dalam bulatan. Lungsuran kurang pantas/licin. Teknik betul.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Lungsur serentak. Kaki dalam bulatan. Kurang pantas. Teknik betul perlu dibaiki.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Tidak melungsurkan kaki serentak. Kaki tidak dalam bulatan. Tidak pantas. Teknik salah.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Teknik lungsuran salah sepenuhnya.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Lontaran (10%)</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria (Kilasan, Tolakan, Pelepasan)</th></tr></thead>
+                            <tbody>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Pinggul pusing kiri/atas serentak kilasan badan. Tolak lurus lutut, badan lentik. Mula dari bahu, pindah berat, ikut lajak.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Pinggul pusing serentak. Tolak lurus lutut. Mula bahu, pindah berat, ikut lajak. Teknik betul.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Pinggul kurang dipusingkan. Kurang menolak lutut. Kurang pindah berat. Kurang ikut lajak.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Pinggul kurang dipusingkan. Kurang menolak lutut. Kurang pindah berat. Teknik perlu dibaiki.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Pinggul tidak dipusingkan. Tidak menolak lutut. Tiada pemindahan berat. Teknik salah.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">4. Fasa Pulihan (5%)</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria (Imbangan, Ikut Lajak)</th></tr></thead>
+                            <tbody>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Imbang badan (tidak batal). Ikut lajak. Kaki kanan ke hadapan & bengkok pada masa yang betul/tepat.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Imbang badan. Ikut lajak. Kaki kanan ke hadapan & bengkok pada masa yang betul. Teknik baik.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Kurang imbang. Kurang ikut lajak. Kaki kanan dibawa ke hadapan pada masa yang sama.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Kurang imbang. Kurang ikut lajak. Kaki kanan dibawa ke hadapan pada masa <strong>tidak</strong> sama.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Tidak berjaya imbang. Tiada ikut lajak. Teknik salah.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-100 p-4 flex justify-end border-t shrink-0">
+                <button onclick="toggleRubric(false)" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-bold transition shadow">Tutup</button>
+            </div>
+        </div>
+    </div>
 
     <div id="login-view" class="fixed inset-0 login-bg z-[60] flex items-center justify-center p-4">
         <div class="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-yellow-500 relative z-10">
@@ -66,26 +168,14 @@
                     <i class="fas fa-graduation-cap text-3xl"></i>
                 </div>
                 <h1 class="text-3xl font-extrabold text-slate-800">MPU3411</h1>
-                <p class="text-slate-500 font-medium">Sistem Pengurusan Markah Kokurikulum Olahraga 2026</p>
+                <p class="text-slate-500 font-medium">Sistem Pengurusan Markah Kokurikulum Olahraga</p>
             </div>
             <form id="login-form" class="space-y-5">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Emel Rasmi</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-3 text-gray-400"><i class="fas fa-envelope"></i></span>
-                        <input type="email" id="email" class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="nama@organisasi.com" required>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Kata Laluan</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-3 text-gray-400"><i class="fas fa-lock"></i></span>
-                        <input type="password" id="password" class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="••••••••" required>
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg transition transform hover:scale-[1.02]">LOG MASUK</button>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1">Emel Rasmi</label><input type="email" id="email" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required></div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1">Kata Laluan</label><input type="password" id="password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required></div>
+                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg">LOG MASUK</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Versi 6.0 | hanifffaizal2026</p>
+            <p class="text-xs text-center text-gray-400 mt-6">Versi 7.0 | hanifffaizal2026</p>
         </div>
     </div>
 
@@ -94,7 +184,7 @@
             <div class="px-6 flex justify-between items-center h-full max-w-7xl mx-auto w-full">
                 <div class="flex items-center gap-3">
                     <div class="bg-yellow-700 text-slate-900 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl">M</div>
-                    <div><h1 class="text-xl font-bold">MPU3411 KOKURIKULUM OLAHRAGA</h1><p class="text-xs text-slate-700">Pengguna: <span id="user-display-name">...</span> | <span id="user-role-display">...</span></p></div>
+                    <div><h1 class="text-xl font-bold">MPU3411 KOKURIKULUM OLAHRAGA</h1><p class="text-xs text-slate-400">Pengguna: <span id="user-display-name">...</span> | <span id="user-role-display">...</span></p></div>
                 </div>
                 <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2"><i class="fas fa-sign-out-alt"></i>KELUAR</button>
             </div>
@@ -110,7 +200,6 @@
         </div>
 
         <div class="main-content-area max-w-7xl mx-auto px-4">
-            
             <section id="dashboard" class="content-section block">
                 <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg mb-6 text-sm flex items-center gap-2">
                     <i class="fas fa-info-circle"></i> <span>Data dipaparkan untuk kelas: <span id="user-class-badge" class="font-bold underline">...</span></span>
@@ -209,54 +298,6 @@
         </div>
     </div>
 
-    <div id="rubric-modal" class="rubric-modal hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
-            <div class="bg-green-700 text-white p-4 flex justify-between items-center shrink-0">
-                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-book-open"></i> Rubrik Amali HP3 (5 Peringkat)</h3>
-                <button onclick="toggleRubric(false)" class="hover:bg-green-600 p-2 rounded-full transition"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <div class="flex border-b bg-gray-50 shrink-0">
-                <button onclick="switchRubricTab('balapan')" id="tab-btn-balapan" class="flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white hover:bg-gray-50 transition"><i class="fas fa-stopwatch mr-2"></i> ACARA BALAPAN</button>
-                <button onclick="switchRubricTab('padang')" id="tab-btn-padang" class="flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition"><i class="fas fa-dot-circle mr-2"></i> ACARA PADANG</button>
-            </div>
-            <div class="p-5 overflow-y-auto bg-gray-50 flex-1">
-                <div id="rubric-content-balapan" class="block space-y-6">
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Permulaan (10%)</h4>
-                        <table class="w-full rubric-table border-collapse">
-                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
-                            <tbody>
-                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Blok betul tanpa bantuan. Posisi dekam sempurna.</td></tr>
-                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Blok betul. Posisi dekam betul.</td></tr>
-                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Blok hampir betul. Posisi dekam minima kesalahan.</td></tr>
-                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Blok kesalahan kecil/bantuan. Teknik kurang betul.</td></tr>
-                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Blok bantuan penuh. Posisi salah.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    </div>
-                <div id="rubric-content-padang" class="hidden space-y-6">
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Persediaan (5%)</h4>
-                        <table class="w-full rubric-table border-collapse">
-                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
-                            <tbody>
-                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Peluru tidak sentuh tapak tangan. Sentuh sisi leher.</td></tr>
-                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Kriteria sama seperti Amat Cemerlang tetapi dilakukan dengan baik.</td></tr>
-                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Peluru tidak sentuh sisi leher dengan tepat.</td></tr>
-                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Tidak memegang di pangkal jari. Kedudukan peluru salah.</td></tr>
-                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Teknik salah sepenuhnya.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-100 p-4 flex justify-end border-t shrink-0">
-                <button onclick="toggleRubric(false)" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-bold transition shadow">Tutup</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // ============================================
         // PASTE URL ANDA DI SINI
@@ -343,7 +384,7 @@
         }
         function logout() { if(confirm("Log keluar?")) location.reload(); }
 
-        // --- DASHBOARD LOGIC (FIXED) ---
+        // --- DASHBOARD LOGIC ---
         function updateDashboard() {
             let targetStudents = allStudents;
             const assignedClass = currentUser.kelas;
