@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pemarkahan MPU3411 Pro (Rubrik 5 Peringkat)</title>
+    <title>Sistem Pemarkahan MPU3411 Pro (V3 - Fix Pengiraan)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -47,11 +47,11 @@
         /* Rubric Table Specifics */
         .rubric-table th { background-color: #e2e8f0; color: #1e293b; font-weight: bold; border: 1px solid #cbd5e1; }
         .rubric-table td { border: 1px solid #e2e8f0; vertical-align: top; padding: 8px; font-size: 0.85rem; }
-        .bg-level-5 { background-color: #d1fae5; } /* Amat Cemerlang - Green */
-        .bg-level-4 { background-color: #dbeafe; } /* Cemerlang - Blue */
-        .bg-level-3 { background-color: #e0f2fe; } /* Kepujian - Light Blue */
-        .bg-level-2 { background-color: #fef9c3; } /* Sederhana - Yellow */
-        .bg-level-1 { background-color: #fee2e2; } /* Lemah - Red */
+        .bg-level-5 { background-color: #d1fae5; } 
+        .bg-level-4 { background-color: #dbeafe; } 
+        .bg-level-3 { background-color: #e0f2fe; } 
+        .bg-level-2 { background-color: #fef9c3; } 
+        .bg-level-1 { background-color: #fee2e2; } 
     </style>
 </head>
 <body class="text-gray-800">
@@ -65,310 +65,112 @@
 
     <div id="rubric-modal" class="rubric-modal hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
-            
             <div class="bg-green-700 text-white p-4 flex justify-between items-center shrink-0">
-                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-book-open"></i> Rubrik Pemarkahan Amali HP3 </h3>
+                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-book-open"></i> Rubrik Pemarkahan Amali HP3 (5 Peringkat)</h3>
                 <button onclick="toggleRubric(false)" class="hover:bg-green-600 p-2 rounded-full transition"><i class="fas fa-times text-xl"></i></button>
             </div>
-
             <div class="flex border-b bg-gray-50 shrink-0">
-                <button onclick="switchRubricTab('balapan')" id="tab-btn-balapan" class="flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white hover:bg-gray-50 transition">
-                    <i class="fas fa-stopwatch mr-2"></i> ACARA BALAPAN (LARI PECUT)
-                </button>
-                <button onclick="switchRubricTab('padang')" id="tab-btn-padang" class="flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition">
-                    <i class="fas fa-dot-circle mr-2"></i> ACARA PADANG (LONTAR PELURU)
-                </button>
+                <button onclick="switchRubricTab('balapan')" id="tab-btn-balapan" class="flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white hover:bg-gray-50 transition"><i class="fas fa-stopwatch mr-2"></i> ACARA BALAPAN</button>
+                <button onclick="switchRubricTab('padang')" id="tab-btn-padang" class="flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition"><i class="fas fa-dot-circle mr-2"></i> ACARA PADANG</button>
             </div>
-
             <div class="p-5 overflow-y-auto bg-gray-50 flex-1">
-                
                 <div id="rubric-content-balapan" class="block space-y-6">
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Permulaan (10%) - Memasang Blok & Teknik Mula</h4>
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Permulaan (10%)</h4>
                         <table class="w-full rubric-table border-collapse">
-                            <thead>
-                                <tr>
-                                    <th class="w-1/6">Tahap</th>
-                                    <th class="w-1/6">Markah</th>
-                                    [cite_start]<th>Kriteria (Persediaan, Ke Garisan, Sedia) [cite: 9, 12]</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
                             <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td>
-                                    <td class="text-center font-bold">9.0 - 10</td>
-                                    <td>Memasang blok betul tanpa bantuan. Langkah pantas ke garisan. Posisi dekam & tangan tepat. Punggung tinggi dari kepala, berat ke hadapan, kaki bersudut, kepala tunduk relaks.</td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td>
-                                    <td class="text-center font-bold">7.5 - 8.9</td>
-                                    <td>Memasang blok betul. Melangkah ke garisan. Posisi dekam betul. Punggung tidak begitu tinggi, berat ke hadapan, kepala tunduk.</td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td>
-                                    <td class="text-center font-bold">6.0 - 7.4</td>
-                                    <td>Memasang blok hampir betul tanpa kesalahan. Kurang bersedia. Posisi dekam kesalahan minima. Punggung sama aras kepala, berat ke hadapan, kepala tunduk.</td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td>
-                                    <td class="text-center font-bold">5.0 - 5.9</td>
-                                    <td>Memasang blok kesalahan kecil/bantuan. Lambat ke garisan. Posisi dekam dengan bantuan. Punggung kurang tinggi, kepala tidak relaks. Teknik kurang betul.</td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td>
-                                    <td class="text-center font-bold">&lt; 4.9</td>
-                                    <td>Memasang blok dengan bantuan penuh. Teragak-agak ke garisan. Posisi salah. Punggung tidak tinggi, berat tidak ke hadapan, banyak kelemahan.</td>
-                                </tr>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Blok betul tanpa bantuan. Posisi dekam sempurna. Punggung tinggi dari kepala, berat ke hadapan.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Blok betul. Posisi dekam betul. Punggung tidak terlalu tinggi.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Blok hampir betul. Posisi dekam minima kesalahan. Punggung sama aras kepala.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Blok kesalahan kecil/bantuan. Punggung kurang tinggi. Teknik kurang betul.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Blok bantuan penuh. Posisi salah. Punggung tidak tinggi.</td></tr>
                             </tbody>
                         </table>
                     </div>
-
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Larian (10%) - Mula, Tolakan & Koordinasi</h4>
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Larian (10%)</h4>
                         <table class="w-full rubric-table border-collapse">
-                            <thead>
-                                <tr>
-                                    <th class="w-1/6">Tahap</th>
-                                    <th class="w-1/6">Markah</th>
-                                    [cite_start]<th>Kriteria (Mula, Tolakan Kaki, Koordinasi Tangan/Kaki) [cite: 13]</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
                             <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td>
-                                    <td class="text-center font-bold">9.0 - 10</td>
-                                    <td>Masa tindak balas amat pantas. Tolakan maksimum tanpa lonjakan. Koordinasi tangan/kaki selaras. Ayunan optimum. Teknik mula betul tanpa bantuan.</td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td>
-                                    <td class="text-center font-bold">7.5 - 8.9</td>
-                                    <td>Masa tindak balas pantas. Tolakan maksimum sedikit melonjak. Koordinasi betul. Ayunan tangan maksimum. Teknik mula betul dengan bantuan minima.</td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td>
-                                    <td class="text-center font-bold">6.0 - 7.4</td>
-                                    <td>Masa tindak balas agak pantas. Tolakan agak maksimum tidak melonjak. Koordinasi agak betul. Ayunan agak maksimum. Teknik mula betul.</td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td>
-                                    <td class="text-center font-bold">5.0 - 5.9</td>
-                                    <td>Masa tindak balas kurang pantas. Tolakan kurang maksimum. Koordinasi kurang sempurna. Ayunan kurang maksimum. Teknik kurang betul.</td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td>
-                                    <td class="text-center font-bold">&lt; 4.9</td>
-                                    <td>Masa tindak balas lambat. Tiada tolakan/melonjak. Tiada koordinasi. Ayunan minimum. Banyak kelemahan teknik permulaan.</td>
-                                </tr>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Tindak balas pantas. Tolakan maksimum. Koordinasi selaras.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Tindak balas pantas. Tolakan maksimum (sedikit lonjak). Koordinasi betul.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Tindak balas agak pantas. Tolakan agak maksimum. Koordinasi agak betul.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Tindak balas kurang pantas. Koordinasi kurang sempurna.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Tindak balas lambat. Tiada koordinasi.</td></tr>
                             </tbody>
                         </table>
                     </div>
-
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Penamat (5%) - Teknik Penamat</h4>
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Penamat (5%)</h4>
                         <table class="w-full rubric-table border-collapse">
-                            <thead>
-                                <tr>
-                                    <th class="w-1/6">Tahap</th>
-                                    <th class="w-1/6">Markah</th>
-                                    [cite_start]<th>Kriteria (Torso, Dipping, Kekal Kepantasan) [cite: 14]</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
                             <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td>
-                                    <td class="text-center font-bold">4.5 - 5.0</td>
-                                    <td>Melintasi dengan 'Torso'. Membuat dipping dengan tangan diayun ke belakang tekal. Kekalkan kepantasan & imbangan. Teknik betul tanpa bantuan.</td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td>
-                                    <td class="text-center font-bold">3.8 - 4.4</td>
-                                    <td>Melintasi dengan 'Torso'. Membuat dipping tangan ke belakang. Kekalkan kepantasan & imbangan. Teknik betul.</td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td>
-                                    <td class="text-center font-bold">3.0 - 3.7</td>
-                                    <td>Melintasi dengan 'Torso'. Membuat dipping tangan dihayun. Agak mengekalkan kepantasan & imbangan. Teknik agak betul.</td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td>
-                                    <td class="text-center font-bold">2.5 - 2.9</td>
-                                    <td>Melintasi garisan. Dipping tanpa tangan dihayun. Tidak mengekalkan kepantasan. Teknik kurang betul, banyak perlu diperbaiki.</td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td>
-                                    <td class="text-center font-bold">0.0 - 2.4</td>
-                                    <td>Berhenti serta merta di garisan. Tidak membuat dipping. Tidak kekal kepantasan. Banyak kelemahan.</td>
-                                </tr>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Melintasi dengan 'Torso'. Dipping tangan ke belakang. Kekal kepantasan.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Melintasi dengan 'Torso'. Dipping tangan ke belakang. Teknik betul.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Melintasi dengan 'Torso'. Dipping tangan dihayun. Agak mengekalkan kepantasan.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Dipping tanpa tangan dihayun. Tidak mengekalkan kepantasan.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Berhenti serta merta. Tidak membuat dipping.</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
                 <div id="rubric-content-padang" class="hidden space-y-6">
-                    
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Persediaan (5%) - Pegangan & Sedia</h4>
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Persediaan (5%)</h4>
                         <table class="w-full rubric-table border-collapse">
-                            <thead>
-                                <tr>
-                                    <th class="w-1/6">Tahap</th>
-                                    <th class="w-1/6">Markah</th>
-                                    [cite_start]<th>Kriteria (Pegangan, Kedudukan Peluru, Posisi) [cite: 2]</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
                             <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td>
-                                    <td class="text-center font-bold">4.5 - 5.0</td>
-                                    <td>Peluru tidak sentuh tapak tangan (pangkal 3/5 jari). Sentuh sisi leher/bawah telinga. Berdiri membelakangkan kawasan. Teknik tepat.</td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td>
-                                    <td class="text-center font-bold">3.8 - 4.4</td>
-                                    <td>Kriteria sama seperti Amat Cemerlang tetapi dilakukan dengan baik (sedikit perbezaan kualiti).</td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td>
-                                    <td class="text-center font-bold">3.0 - 3.7</td>
-                                    <td>Peluru tidak sentuh tapak tangan. Kedudukan peluru <strong>tidak</strong> menyentuh sisi leher dengan tepat. Teknik betul perlu dibaiki.</td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td>
-                                    <td class="text-center font-bold">2.5 - 2.9</td>
-                                    <td>Peluru tidak sentuh tapak tangan. <strong>Tidak</strong> memegang di pangkal jari. Kedudukan peluru salah. <strong>Tidak</strong> membelakangkan kawasan. Teknik salah.</td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td>
-                                    <td class="text-center font-bold">0.0 - 2.4</td>
-                                    <td>Teknik pegangan dan persediaan salah sepenuhnya.</td>
-                                </tr>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Peluru tidak sentuh tapak tangan. Sentuh sisi leher. Membelakangkan kawasan.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Kriteria sama seperti Amat Cemerlang tetapi dilakukan dengan baik.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Peluru tidak sentuh sisi leher dengan tepat. Teknik betul perlu dibaiki.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Tidak memegang di pangkal jari. Kedudukan peluru salah.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Teknik salah sepenuhnya.</td></tr>
                             </tbody>
                         </table>
                     </div>
-
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                         <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Lungsuran (5%)</h4>
                         <table class="w-full rubric-table border-collapse">
-                            <thead>
-                                <tr>
-                                    <th class="w-1/6">Tahap</th>
-                                    <th class="w-1/6">Markah</th>
-                                    [cite_start]<th>Kriteria (Pergerakan Kaki, Keseimbangan) [cite: 2]</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
                             <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td>
-                                    <td class="text-center font-bold">4.5 - 5.0</td>
-                                    <td>Lungsur kedua kaki serentak. Kedua kaki dalam bulatan. Lungsuran pantas dan licin. Teknik betul dan tepat.</td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td>
-                                    <td class="text-center font-bold">3.8 - 4.4</td>
-                                    <td>Lungsur serentak. Kaki dalam bulatan. Lungsuran <strong>kurang</strong> pantas dan licin. Teknik betul dan tepat.</td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td>
-                                    <td class="text-center font-bold">3.0 - 3.7</td>
-                                    <td>Lungsur serentak. Kaki dalam bulatan. Kurang pantas. Teknik betul perlu dibaiki.</td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td>
-                                    <td class="text-center font-bold">2.5 - 2.9</td>
-                                    <td><strong>Tidak</strong> melungsurkan kaki serentak. Kaki tidak dalam bulatan. Tidak pantas. Teknik salah.</td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td>
-                                    <td class="text-center font-bold">0.0 - 2.4</td>
-                                    <td>Teknik lungsuran salah sepenuhnya.</td>
-                                </tr>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Lungsur serentak. Kaki dalam bulatan. Pantas dan licin.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Lungsur serentak. Kurang pantas dan licin.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Lungsur serentak. Kurang pantas. Teknik perlu dibaiki.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Tidak serentak. Kaki tidak dalam bulatan. Tidak pantas.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Teknik salah sepenuhnya.</td></tr>
                             </tbody>
                         </table>
                     </div>
-
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Lontaran (10%) - Kilasan & Teknik Lontar</h4>
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Lontaran (10%)</h4>
                         <table class="w-full rubric-table border-collapse">
-                            <thead>
-                                <tr>
-                                    <th class="w-1/6">Tahap</th>
-                                    <th class="w-1/6">Markah</th>
-                                    [cite_start]<th>Kriteria (Kilasan Pinggul, Tolakan, Pelepasan) [cite: 5]</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
                             <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td>
-                                    <td class="text-center font-bold">9.0 - 10</td>
-                                    <td>Pinggul kanan pusing kiri/atas serentak kilasan badan. Tolak lurus lutut, badan lentik. Mula dari bahu, pindah berat, ikut lajak.</td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td>
-                                    <td class="text-center font-bold">7.5 - 8.9</td>
-                                    <td>Pinggul pusing serentak. Tolak lurus lutut. Mula bahu, pindah berat, ikut lajak. Teknik betul.</td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td>
-                                    <td class="text-center font-bold">6.0 - 7.4</td>
-                                    <td>Pinggul <strong>kurang</strong> dipusingkan. Kurang menolak lutut. Kurang pindah berat. Kurang ikut lajak. Teknik betul perlu dibaiki.</td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td>
-                                    <td class="text-center font-bold">5.0 - 5.9</td>
-                                    <td>Pinggul kurang dipusingkan. Kurang menolak lutut. Kurang pindah berat. Teknik betul perlu dibaiki.</td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td>
-                                    <td class="text-center font-bold">&lt; 4.9</td>
-                                    <td>Pinggul <strong>tidak</strong> dipusingkan. Tidak menolak lutut. Tiada pemindahan berat. Teknik salah.</td>
-                                </tr>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Pinggul pusing kiri/atas serentak. Tolak lurus lutut. Mula dari bahu, ikut lajak.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Pinggul pusing serentak. Tolak lurus lutut. Teknik betul.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Pinggul kurang dipusingkan. Kurang menolak lutut.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Kurang pemindahan berat. Teknik betul perlu dibaiki.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Pinggul tidak dipusingkan. Teknik salah.</td></tr>
                             </tbody>
                         </table>
                     </div>
-
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                         <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">4. Fasa Pulihan (5%)</h4>
                         <table class="w-full rubric-table border-collapse">
-                            <thead>
-                                <tr>
-                                    <th class="w-1/6">Tahap</th>
-                                    <th class="w-1/6">Markah</th>
-                                    [cite_start]<th>Kriteria (Imbangan, Ikut Lajak, Kaki Kanan) [cite: 5]</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
                             <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td>
-                                    <td class="text-center font-bold">4.5 - 5.0</td>
-                                    <td>Imbang badan (tidak batal). Pergerakan ikut lajak. Kaki kanan ke hadapan & bengkok pada masa yang betul/tepat.</td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td>
-                                    <td class="text-center font-bold">3.8 - 4.4</td>
-                                    <td>Imbang badan. Ikut lajak. Kaki kanan ke hadapan & bengkok pada masa yang betul. Teknik baik.</td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td>
-                                    <td class="text-center font-bold">3.0 - 3.7</td>
-                                    <td>Kurang imbang. Kurang ikut lajak. Kaki kanan dibawa ke hadapan pada masa yang sama. Teknik perlu dibaiki.</td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td>
-                                    <td class="text-center font-bold">2.5 - 2.9</td>
-                                    <td>Kurang imbang. Kurang ikut lajak. Kaki kanan dibawa ke hadapan pada masa <strong>tidak</strong> sama. Teknik perlu dibaiki.</td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td>
-                                    <td class="text-center font-bold">0.0 - 2.4</td>
-                                    <td>Tidak berjaya imbang. Tiada ikut lajak. Teknik salah.</td>
-                                </tr>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Imbang badan. Ikut lajak. Kaki kanan ke hadapan & bengkok tepat.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Imbang badan. Teknik baik.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Kurang imbang. Kaki kanan dibawa ke hadapan pada masa yang sama.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Kaki kanan dibawa ke hadapan pada masa tidak sama.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Tidak berjaya imbang. Tiada ikut lajak.</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
-            
             <div class="bg-gray-100 p-4 flex justify-end border-t shrink-0">
                 <button onclick="toggleRubric(false)" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-bold transition shadow">Tutup</button>
             </div>
@@ -382,7 +184,7 @@
                     <i class="fas fa-graduation-cap text-3xl"></i>
                 </div>
                 <h1 class="text-3xl font-extrabold text-slate-800">MPU3411</h1>
-                <p class="text-slate-500 font-medium">Sistem Pengurusan Markah Kokurikulum Olahraga</p>
+                <p class="text-slate-500 font-medium">Sistem Pengurusan Markah</p>
             </div>
             <form id="login-form" class="space-y-5">
                 <div>
@@ -401,7 +203,7 @@
                 </div>
                 <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg transition transform hover:scale-[1.02]">LOG MASUK</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Versi 2.1 | Haniff Faizal 2026</p>
+            <p class="text-xs text-center text-gray-400 mt-6">Versi 3.0 | Fix Pengiraan Kelas</p>
         </div>
     </div>
 
@@ -411,8 +213,8 @@
                 <div class="flex items-center gap-3">
                     <div class="bg-yellow-500 text-slate-900 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl shadow">M</div>
                     <div>
-                        <h1 class="text-lg md:text-xl font-bold tracking-tight">MPU3411 KOKURIKULUM OLAHRAGA</h1>
-                        <p class="text-[10px] md:text-xs text-slate-600">Pengguna: <span id="user-display-name" class="font-bold text-white">...</span> | <span id="user-role-display" class="uppercase text-yellow-600">...</span></p>
+                        <h1 class="text-lg md:text-xl font-bold tracking-tight">MPU3411 SEM II</h1>
+                        <p class="text-[10px] md:text-xs text-slate-400">Pengguna: <span id="user-display-name" class="font-bold text-white">...</span> | <span id="user-role-display" class="uppercase text-yellow-400">...</span></p>
                     </div>
                 </div>
                 <button onclick="logout()" class="bg-red-600/90 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition flex items-center gap-2">
@@ -423,24 +225,20 @@
 
         <div class="fixed top-[70px] left-0 right-0 bg-white z-40 border-b border-gray-200 shadow-sm">
             <nav class="flex px-4 py-2 space-x-2 overflow-x-auto max-w-7xl mx-auto hide-scrollbar">
-                <button onclick="nav('dashboard')" id="btn-dashboard" class="nav-btn active px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap">
-                    <i class="fas fa-chart-pie"></i> Dashboard
-                </button>
-                <button onclick="nav('ujian')" id="btn-ujian" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap text-gray-600 hover:bg-gray-100">
-                    <i class="fas fa-file-alt"></i> Ujian (30%)
-                </button>
-                <button onclick="nav('hp3')" id="btn-hp3" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap text-gray-600 hover:bg-gray-100">
-                    <i class="fas fa-running"></i> Amali HP3 (50%)
-                </button>
-                <button onclick="nav('hp7')" id="btn-hp7" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap text-gray-600 hover:bg-gray-100">
-                    <i class="fas fa-tools"></i> HP7 (20%)
-                </button>
+                <button onclick="nav('dashboard')" id="btn-dashboard" class="nav-btn active px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap"><i class="fas fa-chart-pie"></i> Dashboard</button>
+                <button onclick="nav('ujian')" id="btn-ujian" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap text-gray-600 hover:bg-gray-100"><i class="fas fa-file-alt"></i> Ujian (30%)</button>
+                <button onclick="nav('hp3')" id="btn-hp3" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap text-gray-600 hover:bg-gray-100"><i class="fas fa-running"></i> Amali HP3 (50%)</button>
+                <button onclick="nav('hp7')" id="btn-hp7" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap text-gray-600 hover:bg-gray-100"><i class="fas fa-tools"></i> HP7 (20%)</button>
             </nav>
         </div>
 
         <div class="main-content-area max-w-7xl mx-auto px-4">
-
             <section id="dashboard" class="content-section block">
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg mb-6 text-sm flex items-center gap-3">
+                    <i class="fas fa-info-circle text-xl"></i>
+                    <div><strong>Info:</strong> Statistik di bawah hanya menunjukkan data bagi kelas anda: <span id="user-class-badge" class="font-bold underline">...</span></div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden group">
                         <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition"><i class="fas fa-users text-6xl text-slate-800"></i></div>
@@ -468,8 +266,7 @@
                     <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                         <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fas fa-list"></i> Ringkasan Prestasi Pelajar</h3>
                         <select id="dash-filter-class" onchange="renderDashboardTable()" class="text-xs p-2 border rounded bg-white font-semibold outline-none focus:ring-1 focus:ring-blue-500">
-                            <option value="all">Semua Kelas</option>
-                        </select>
+                            </select>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full styled-table text-sm">
@@ -497,24 +294,14 @@
                     <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center border-b pb-4"><i class="fas fa-file-alt text-blue-600 mr-3"></i> Markah Ujian (30%)</h2>
                     <form id="form-ujian" onsubmit="handleFormSubmit(event, 'MARKAH_UJIAN')">
                         <div class="bg-blue-50/50 p-5 rounded-lg border border-blue-100 mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih Kelas</label>
-                                <select id="sel-class-ujian" onchange="filterStudents('ujian')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition"></select>
-                            </div>
+                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih Kelas</label><select id="sel-class-ujian" onchange="filterStudents('ujian')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition"></select></div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cari / Pilih Pelajar</label>
                                 <input type="text" id="search-student-ujian" onkeyup="searchDropdown('ujian')" placeholder="Taip nama..." class="w-full p-2 mb-1 text-xs border border-gray-300 rounded bg-white focus:outline-none focus:border-blue-500">
                                 <select id="sel-student-ujian" onchange="loadStudentData('ujian')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" disabled></select>
                             </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Penuh</label>
-                                <input type="text" id="name-ujian" class="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-gray-700 cursor-not-allowed" readonly>
-                                <input type="hidden" name="ID_SISTEM" id="id-ujian">
-                                <input type="hidden" name="Nama_Pelajar" id="hidden-name-ujian">
-                                <input type="hidden" name="Kelas" id="class-ujian">
-                            </div>
+                            <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Penuh</label><input type="text" id="name-ujian" class="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-gray-700 cursor-not-allowed" readonly><input type="hidden" name="ID_SISTEM" id="id-ujian"><input type="hidden" name="Nama_Pelajar" id="hidden-name-ujian"><input type="hidden" name="Kelas" id="class-ujian"></div>
                         </div>
-
                         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                             <div><label class="text-xs font-bold text-gray-600 block mb-1">S1(a) [Max 5]</label><input type="number" name="S1A_Markah" class="score-in w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none" step="0.1" max="5"></div>
                             <div><label class="text-xs font-bold text-gray-600 block mb-1">S1(b) [Max 5]</label><input type="number" name="S1B_Markah" class="score-in w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none" step="0.1" max="5"></div>
@@ -522,7 +309,6 @@
                             <div><label class="text-xs font-bold text-gray-600 block mb-1">S2(b) [Max 5]</label><input type="number" name="S2B_Markah" class="score-in w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none" step="0.1" max="5"></div>
                             <div><label class="text-xs font-bold text-gray-600 block mb-1">S1(c) [Max 10]</label><input type="number" name="S1C_Markah" class="score-in w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none" step="0.1" max="10"></div>
                         </div>
-
                         <div class="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 gap-4">
                             <div class="text-lg font-bold text-gray-700 bg-gray-50 px-4 py-2 rounded-lg border">Jumlah: <span id="total-ujian" class="text-blue-600 text-2xl ml-2">0</span> <span class="text-gray-400 text-sm">/ 30</span></div>
                             <input type="hidden" name="Jumlah_Ujian" id="val-total-ujian">
@@ -536,23 +322,14 @@
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 max-w-4xl mx-auto">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 mb-6 gap-4">
                         <h2 class="text-2xl font-bold text-slate-800 flex items-center"><i class="fas fa-running text-green-600 mr-3"></i> Amali HP3 (50%)</h2>
-                        <button onclick="toggleRubric(true)" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow transition flex items-center gap-2">
-                            <i class="fas fa-list-alt"></i> LIHAT RUBRIK
-                        </button>
+                        <button onclick="toggleRubric(true)" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow transition flex items-center gap-2"><i class="fas fa-list-alt"></i> LIHAT RUBRIK</button>
                     </div>
-
                     <form id="form-hp3" onsubmit="handleFormSubmit(event, 'MARKAH_AMALI_HP3')">
                         <div class="bg-green-50/50 p-5 rounded-lg border border-green-100 mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih Kelas</label><select id="sel-class-hp3" onchange="filterStudents('hp3')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-green-500 outline-none"></select></div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cari / Pilih Pelajar</label>
-                                <input type="text" id="search-student-hp3" onkeyup="searchDropdown('hp3')" placeholder="Taip nama..." class="w-full p-2 mb-1 text-xs border border-gray-300 rounded bg-white focus:outline-none focus:border-green-500">
-                                <select id="sel-student-hp3" onchange="loadStudentData('hp3')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-green-500 outline-none" disabled></select>
-                            </div>
-                            <div class="md:col-span-2"><input type="text" id="name-hp3" class="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-gray-700 cursor-not-allowed" readonly></div>
-                            <input type="hidden" name="ID_SISTEM" id="id-hp3"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp3"><input type="hidden" name="Kelas" id="class-hp3">
+                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cari / Pilih Pelajar</label><input type="text" id="search-student-hp3" onkeyup="searchDropdown('hp3')" placeholder="Taip nama..." class="w-full p-2 mb-1 text-xs border border-gray-300 rounded bg-white focus:outline-none focus:border-green-500"><select id="sel-student-hp3" onchange="loadStudentData('hp3')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-green-500 outline-none" disabled></select></div>
+                            <div class="md:col-span-2"><input type="text" id="name-hp3" class="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-gray-700 cursor-not-allowed" readonly><input type="hidden" name="ID_SISTEM" id="id-hp3"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp3"><input type="hidden" name="Kelas" id="class-hp3"></div>
                         </div>
-                        
                         <div class="mb-6">
                             <h3 class="bg-green-100 text-green-800 px-4 py-1.5 font-bold text-sm rounded-lg mb-3 inline-flex items-center gap-2"><i class="fas fa-stopwatch"></i> Balapan</h3>
                             <div class="grid grid-cols-3 gap-4">
@@ -561,7 +338,6 @@
                                 <div><label class="text-xs block mb-1">Penamat [5]</label><input type="number" name="HP3_Penamat_5" class="score-in-hp3 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-green-500" step="0.1" max="5"></div>
                             </div>
                         </div>
-
                         <div class="mb-6">
                             <h3 class="bg-green-100 text-green-800 px-4 py-1.5 font-bold text-sm rounded-lg mb-3 inline-flex items-center gap-2"><i class="fas fa-futbol"></i> Padang</h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -571,7 +347,6 @@
                                 <div><label class="text-xs block mb-1">Pulihan [5]</label><input type="number" name="HP3_Pulihan_5" class="score-in-hp3 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-green-500" step="0.1" max="5"></div>
                             </div>
                         </div>
-
                         <div class="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 gap-4">
                             <div class="text-lg font-bold text-gray-700 bg-gray-50 px-4 py-2 rounded-lg border">Jumlah: <span id="total-hp3" class="text-green-600 text-2xl ml-2">0</span> <span class="text-gray-400 text-sm">/ 50</span></div>
                             <input type="hidden" name="Jumlah_HP3" id="val-total-hp3">
@@ -592,15 +367,12 @@
                                 <input type="text" id="search-student-hp7" onkeyup="searchDropdown('hp7')" placeholder="Taip nama..." class="w-full p-2 mb-1 text-xs border border-gray-300 rounded bg-white focus:outline-none focus:border-yellow-500">
                                 <select id="sel-student-hp7" onchange="loadStudentData('hp7')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-yellow-500 outline-none" disabled></select>
                             </div>
-                            <div class="md:col-span-2"><input type="text" id="name-hp7" class="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-gray-700 cursor-not-allowed" readonly></div>
-                            <input type="hidden" name="ID_SISTEM" id="id-hp7"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp7"><input type="hidden" name="Kelas" id="class-hp7">
+                            <div class="md:col-span-2"><input type="text" id="name-hp7" class="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-gray-700 cursor-not-allowed" readonly><input type="hidden" name="ID_SISTEM" id="id-hp7"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp7"><input type="hidden" name="Kelas" id="class-hp7"></div>
                         </div>
-
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div><label class="text-xs font-bold text-gray-600 block mb-1">Penyediaan Trek [Max 10]</label><input type="number" name="HP7_Penyediaan_Trek_10" class="score-in-hp7 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-yellow-500" step="0.1" max="10"></div>
                             <div><label class="text-xs font-bold text-gray-600 block mb-1">Penyediaan Sektor [Max 10]</label><input type="number" name="HP7_Penyediaan_Sektor_10" class="score-in-hp7 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-yellow-500" step="0.1" max="10"></div>
                         </div>
-
                         <div class="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 gap-4">
                             <div class="text-lg font-bold text-gray-700 bg-gray-50 px-4 py-2 rounded-lg border">Jumlah: <span id="total-hp7" class="text-yellow-600 text-2xl ml-2">0</span> <span class="text-gray-400 text-sm">/ 20</span></div>
                             <input type="hidden" name="Jumlah_HP7" id="val-total-hp7">
@@ -623,74 +395,34 @@
         let existingScores = {};
         let filteredStudentsCache = [];
 
-        // --- RUBRIC MODAL LOGIC ---
+        // --- RUBRIC LOGIC ---
         function toggleRubric(show) {
             const modal = document.getElementById('rubric-modal');
-            if (show) {
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden'; // Stop background scroll
-            } else {
-                modal.classList.add('hidden');
-                document.body.style.overflow = 'auto'; // Enable scroll
-            }
+            show ? modal.classList.remove('hidden') : modal.classList.add('hidden');
         }
-
-        // --- FUNGSI TAB RUBRIK (BALAPAN VS PADANG) ---
         function switchRubricTab(tabName) {
-            // Hide all content
             document.getElementById('rubric-content-balapan').classList.add('hidden');
             document.getElementById('rubric-content-padang').classList.add('hidden');
-            document.getElementById('rubric-content-balapan').classList.remove('block');
-            document.getElementById('rubric-content-padang').classList.remove('block');
-
-            // Reset Button Styles
-            const btnBalapan = document.getElementById('tab-btn-balapan');
-            const btnPadang = document.getElementById('tab-btn-padang');
+            document.getElementById('tab-btn-balapan').classList.replace('text-green-700', 'text-gray-500');
+            document.getElementById('tab-btn-padang').classList.replace('text-green-700', 'text-gray-500');
             
-            btnBalapan.className = "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white hover:bg-gray-50 transition";
-            btnPadang.className = "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition border-b-2 border-transparent";
-            
-            // Inactive state style
             if(tabName === 'balapan') {
-               btnPadang.className = "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition border-b-2 border-transparent";
-               btnBalapan.className = "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition";
-            } else {
-               btnBalapan.className = "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition border-b-2 border-transparent";
-               btnPadang.className = "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition";
-            }
-
-            // Show Selected Content
-            if (tabName === 'balapan') {
                 document.getElementById('rubric-content-balapan').classList.remove('hidden');
-                document.getElementById('rubric-content-balapan').classList.add('block');
+                document.getElementById('tab-btn-balapan').classList.replace('text-gray-500', 'text-green-700');
             } else {
                 document.getElementById('rubric-content-padang').classList.remove('hidden');
-                document.getElementById('rubric-content-padang').classList.add('block');
+                document.getElementById('tab-btn-padang').classList.replace('text-gray-500', 'text-green-700');
             }
         }
-        
-        // Close modal if clicking outside the white box
-        document.getElementById('rubric-modal').addEventListener('click', function(e) {
-            if(e.target === this) toggleRubric(false);
-        });
+        document.getElementById('rubric-modal').addEventListener('click', function(e) { if(e.target===this) toggleRubric(false); });
 
-        // --- INIT & NAVIGATION ---
+        // --- NAVIGATION ---
         function nav(id) {
             document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
             document.getElementById(id).style.display = 'block';
-            
-            // Update Active Tab UI
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-100', 'text-blue-700', 'active');
-                btn.classList.add('text-gray-600', 'hover:bg-gray-100');
-            });
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-100', 'text-blue-700', 'active'));
             const activeBtn = document.getElementById(`btn-${id}`);
-            if(activeBtn) {
-                activeBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
-                activeBtn.classList.add('bg-blue-100', 'text-blue-700', 'active');
-            }
-
-            // Scroll to top
+            if(activeBtn) activeBtn.classList.add('bg-blue-100', 'text-blue-700', 'active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -698,29 +430,20 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             const icon = type === 'success' ? '<i class="fas fa-check-circle mr-3"></i>' : '<i class="fas fa-exclamation-circle mr-3"></i>';
-            
             toast.className = `toast ${type}`;
             toast.innerHTML = `${icon} <span>${message}</span>`;
-            
             container.appendChild(toast);
             requestAnimationFrame(() => toast.classList.add('show'));
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        function showLoader(show) {
-            document.getElementById('loader').style.display = show ? 'flex' : 'none';
-        }
+        function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
 
-        // --- LOGIN LOGIC ---
+        // --- LOGIN ---
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value.trim();
             const pass = document.getElementById('password').value.trim();
-            
             showLoader(true);
             
             fetch(WEB_APP_URL, {
@@ -737,10 +460,7 @@
                     showLoader(false);
                 }
             })
-            .catch(err => { 
-                showToast("Ralat sambungan server", 'error'); 
-                showLoader(false); 
-            });
+            .catch(err => { showToast("Ralat sambungan server", 'error'); showLoader(false); });
         });
 
         function initApp() {
@@ -749,6 +469,12 @@
             document.getElementById('user-display-name').innerText = currentUser.nama;
             document.getElementById('user-role-display').innerText = currentUser.role;
             
+            // Set User Class Info
+            // Assuming currentUser.kelas contains the assigned class (e.g., "BM" or "BMMB1")
+            // If admin, it might be 'ALL'
+            const assignedClass = currentUser.kelas || 'SEMUA';
+            document.getElementById('user-class-badge').innerText = assignedClass;
+
             nav('dashboard');
 
             fetch(WEB_APP_URL, {
@@ -760,7 +486,7 @@
                 if(data.result === 'success'){
                     allStudents = data.data.students;
                     existingScores = data.data.scores;
-                    updateDashboard();
+                    updateDashboard(); // Now correctly filters based on user class
                     initDropdowns('ujian');
                     initDropdowns('hp3');
                     initDropdowns('hp7');
@@ -771,31 +497,68 @@
             });
         }
 
-        function logout() {
-            if(confirm("Log keluar dari sistem?")) location.reload();
-        }
+        function logout() { if(confirm("Log keluar?")) location.reload(); }
 
-        // --- DASHBOARD LOGIC ---
+        // --- DASHBOARD LOGIC (FIXED) ---
         function updateDashboard() {
-            document.getElementById('dash-total').innerText = allStudents.length;
-            document.getElementById('dash-ujian').innerText = Object.keys(existingScores['MARKAH_UJIAN'] || {}).length;
-            document.getElementById('dash-hp3').innerText = Object.keys(existingScores['MARKAH_AMALI_HP3'] || {}).length;
-            document.getElementById('dash-hp7').innerText = Object.keys(existingScores['MARKAH_HP7'] || {}).length;
-            
-            // Populate Filter Class Dropdown
-            const classSet = new Set(allStudents.map(s => s.Kelas));
-            const filterSel = document.getElementById('dash-filter-class');
-            filterSel.innerHTML = '<option value="all">Semua Kelas</option>';
-            Array.from(classSet).sort().forEach(c => {
-                filterSel.innerHTML += `<option value="${c}">${c}</option>`;
+            // 1. FILTER STUDENTS FIRST based on current user's class
+            let targetStudents = allStudents;
+            const assignedClass = currentUser.kelas; // Ensure your login response sends 'kelas'
+
+            // If user is Lecturer and has a specific class assigned (and not ALL)
+            if (currentUser.role === 'PENSYARAH' || (assignedClass && assignedClass !== 'ALL')) {
+                // Filter only students belonging to this lecturer's class
+                targetStudents = allStudents.filter(s => s.Kelas === assignedClass);
+            }
+
+            // 2. CALCULATE STATS BASED ON FILTERED STUDENTS
+            const totalStudents = targetStudents.length;
+            let countUjian = 0;
+            let countHP3 = 0;
+            let countHP7 = 0;
+
+            // Loop strictly through the filtered students
+            targetStudents.forEach(s => {
+                const id = s.ID_SISTEM;
+                if (existingScores['MARKAH_UJIAN'] && existingScores['MARKAH_UJIAN'][id]) countUjian++;
+                if (existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][id]) countHP3++;
+                if (existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][id]) countHP7++;
             });
+
+            // 3. UPDATE DOM
+            document.getElementById('dash-total').innerText = totalStudents;
+            document.getElementById('dash-ujian').innerText = countUjian;
+            document.getElementById('dash-hp3').innerText = countHP3;
+            document.getElementById('dash-hp7').innerText = countHP7;
+            
+            // Populate Filter Class Dropdown (Only relevant class or all if admin)
+            const filterSel = document.getElementById('dash-filter-class');
+            filterSel.innerHTML = ''; // Clear prev options
+
+            if (currentUser.role === 'ADMIN' || assignedClass === 'ALL') {
+                 filterSel.innerHTML = '<option value="all">Semua Kelas</option>';
+                 const classSet = new Set(allStudents.map(s => s.Kelas));
+                 Array.from(classSet).sort().forEach(c => {
+                    filterSel.innerHTML += `<option value="${c}">${c}</option>`;
+                 });
+            } else {
+                // Only show assigned class for lecturer
+                filterSel.innerHTML = `<option value="${assignedClass}">${assignedClass}</option>`;
+                filterSel.disabled = true; // Lock the filter
+            }
 
             renderDashboardTable();
         }
 
         function renderDashboardTable() {
             const tbody = document.getElementById('dashboard-table-body');
-            const filterClass = document.getElementById('dash-filter-class').value;
+            let filterClass = document.getElementById('dash-filter-class').value;
+            
+            // Force filter if user is restricted
+            if (currentUser.role !== 'ADMIN' && currentUser.kelas && currentUser.kelas !== 'ALL') {
+                filterClass = currentUser.kelas;
+            }
+
             tbody.innerHTML = '';
 
             let studentsToRender = allStudents;
@@ -819,6 +582,7 @@
                     return indices.reduce((acc, idx) => acc + (parseFloat(arr[idx])||0), 0).toFixed(1);
                 };
 
+                // NOTE: Adjust indices based on your actual Sheet Columns
                 const valUjian = sUjian ? getSum(sUjian, [5,6,7,8,9]) : '-';
                 const valHP3 = sHP3 ? getSum(sHP3, [5,6,7,8,9,10,11]) : '-';
                 const valHP7 = sHP7 ? getSum(sHP7, [5,6]) : '-';
@@ -845,41 +609,42 @@
             });
         }
 
-        // --- FORM & DROPDOWN LOGIC ---
+        // --- FORM HELPERS ---
         function initDropdowns(suffix) {
-            const classSet = new Set(allStudents.map(s => s.Kelas));
             const sel = document.getElementById(`sel-class-${suffix}`);
             sel.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-            Array.from(classSet).sort().forEach(c => {
-                sel.innerHTML += `<option value="${c}">${c}</option>`;
-            });
+            
+            // Filter dropdown options based on user role
+            let classesToShow = new Set(allStudents.map(s => s.Kelas));
+            
+            if (currentUser.role !== 'ADMIN' && currentUser.kelas && currentUser.kelas !== 'ALL') {
+                // If lecturer, only show their class
+                sel.innerHTML = `<option value="${currentUser.kelas}">${currentUser.kelas}</option>`;
+                sel.value = currentUser.kelas; // Auto-select
+                filterStudents(suffix); // Auto-trigger student load
+            } else {
+                // If Admin, show all
+                Array.from(classesToShow).sort().forEach(c => {
+                    sel.innerHTML += `<option value="${c}">${c}</option>`;
+                });
+            }
         }
 
         function filterStudents(suffix) {
             const cls = document.getElementById(`sel-class-${suffix}`).value;
             const studentSel = document.getElementById(`sel-student-${suffix}`);
             const searchInput = document.getElementById(`search-student-${suffix}`);
-            
             studentSel.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
-            searchInput.value = ''; // Reset search
-
-            if(!cls) {
-                studentSel.disabled = true;
-                filteredStudentsCache = [];
-                return;
-            }
-
+            searchInput.value = '';
+            if(!cls) { studentSel.disabled = true; filteredStudentsCache = []; return; }
             studentSel.disabled = false;
-            // Cache for searching
             filteredStudentsCache = allStudents.filter(s => s.Kelas === cls);
-            
             populateStudentDropdown(suffix, filteredStudentsCache);
         }
 
         function populateStudentDropdown(suffix, students) {
             const studentSel = document.getElementById(`sel-student-${suffix}`);
             studentSel.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
-            
             students.forEach(s => {
                 const isDone = checkDone(suffix, s.ID_SISTEM);
                 const mark = isDone ? '✅ ' : '';
@@ -902,21 +667,14 @@
             const id = document.getElementById(`sel-student-${suffix}`).value;
             if (!id) return;
             const student = allStudents.find(s => s.ID_SISTEM == id);
-            
             if (student) {
                 document.getElementById(`name-${suffix}`).value = student.Nama_Pelajar;
                 document.getElementById(`hidden-name-${suffix}`).value = student.Nama_Pelajar;
                 document.getElementById(`id-${suffix}`).value = student.ID_SISTEM;
                 document.getElementById(`class-${suffix}`).value = student.Kelas;
-
                 let sheetKey = suffix === 'ujian' ? 'MARKAH_UJIAN' : suffix === 'hp3' ? 'MARKAH_AMALI_HP3' : 'MARKAH_HP7';
-                
-                document.querySelectorAll(`#form-${suffix} input[type=number]`).forEach(i => {
-                    i.value = '';
-                    i.classList.remove('border-red-500', 'bg-red-50'); 
-                });
+                document.querySelectorAll(`#form-${suffix} input[type=number]`).forEach(i => { i.value = ''; i.classList.remove('border-red-500', 'bg-red-50'); });
                 calculateTotal(suffix);
-
                 if (existingScores[sheetKey] && existingScores[sheetKey][id]) {
                     const d = existingScores[sheetKey][id];
                     const form = document.getElementById(`form-${suffix}`);
@@ -936,19 +694,11 @@
             }
         }
 
-        function fill(form, name, val) {
-            const inp = form.querySelector(`[name="${name}"]`);
-            if(inp) inp.value = val;
-        }
+        function fill(form, name, val) { const inp = form.querySelector(`[name="${name}"]`); if(inp) inp.value = val; }
 
-        // --- CALCULATION & VALIDATION ---
         document.querySelectorAll('.score-in, .score-in-hp3, .score-in-hp7').forEach(i => {
             i.addEventListener('input', function() {
-                let suffix = '';
-                if(this.classList.contains('score-in')) suffix = 'ujian';
-                else if(this.classList.contains('score-in-hp3')) suffix = 'hp3';
-                else if(this.classList.contains('score-in-hp7')) suffix = 'hp7';
-                
+                let suffix = this.classList.contains('score-in') ? 'ujian' : this.classList.contains('score-in-hp3') ? 'hp3' : 'hp7';
                 calculateTotal(suffix);
             });
         });
@@ -956,62 +706,42 @@
         function calculateTotal(suffix) {
             let total = 0;
             let cls = suffix === 'ujian' ? '.score-in' : suffix === 'hp3' ? '.score-in-hp3' : '.score-in-hp7';
-            
             document.querySelectorAll(`#form-${suffix} ${cls}`).forEach(inp => {
                 let v = parseFloat(inp.value) || 0;
                 let max = parseFloat(inp.getAttribute('max'));
-                
-                if(v > max) { 
-                    inp.value = max; 
-                    v = max;
-                    inp.classList.add('border-red-500', 'bg-red-50');
-                    showToast(`Maksimum markah ialah ${max}`, 'error');
-                } else {
-                    inp.classList.remove('border-red-500', 'bg-red-50');
-                }
-                
+                if(v > max) { inp.value = max; v = max; inp.classList.add('border-red-500', 'bg-red-50'); showToast(`Maksimum ${max}`, 'error'); }
+                else { inp.classList.remove('border-red-500', 'bg-red-50'); }
                 total += v;
             });
             document.getElementById(`total-${suffix}`).innerText = total.toFixed(1);
             document.getElementById(`val-total-${suffix}`).value = total.toFixed(1);
         }
 
-        // --- SUBMIT ---
         function handleFormSubmit(e, sheetName) {
             e.preventDefault();
-            if (!confirm("Adakah anda pasti mahu menyimpan markah ini?")) return;
+            if (!confirm("Simpan markah?")) return;
             showLoader(true);
-
             const formData = new FormData(e.target);
             const dataObj = {};
             formData.forEach((value, key) => dataObj[key] = value);
-
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                body: JSON.stringify({
-                    action: 'save_mark',
-                    sheetName: sheetName,
-                    userEmail: currentUser.email,
-                    role: currentUser.role,
-                    formData: dataObj
-                })
+                body: JSON.stringify({ action: 'save_mark', sheetName: sheetName, userEmail: currentUser.email, role: currentUser.role, formData: dataObj })
             })
             .then(res => res.json())
             .then(res => {
                 if (res.result === 'success') {
-                    showToast("Berjaya Disimpan!", 'success');
-                    const id = dataObj.ID_SISTEM;
+                    showToast("Disimpan!", 'success');
                     if(!existingScores[sheetName]) existingScores[sheetName] = {};
-                    initApp(); 
+                    // Temporary update local score to reflect change immediately (optional)
+                    // Better to re-fetch if precise data needed, but for UX simply allow re-init
+                    setTimeout(() => initApp(), 1000); 
                 } else {
                     showToast("Ralat: " + res.message, 'error');
                     showLoader(false);
                 }
             })
-            .catch(() => {
-                showToast("Ralat sambungan rangkaian", 'error');
-                showLoader(false);
-            });
+            .catch(() => { showToast("Ralat rangkaian", 'error'); showLoader(false); });
         }
     </script>
 </body>
