@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pemarkahan MPU3411 Pro (V3 - Fix Pengiraan)</title>
+    <title>Sistem MPU3411 Pro (V5 - Dashboard Fix)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -13,39 +13,23 @@
         .main-content-area { padding-top: 130px; padding-bottom: 40px; min-height: 100vh; }
         .content-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Loader & Toast */
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.9); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.95); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 10px; }
         .toast { min-width: 300px; padding: 16px; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.3s ease-out; display: flex; align-items: center; }
         .toast.show { transform: translateX(0); }
         .toast.success { background-color: #10b981; }
         .toast.error { background-color: #ef4444; }
-
-        /* Login Background */
         .login-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); position: relative; overflow: hidden; }
-        .login-bg::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); animation: rotate 20s linear infinite; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* Table Styling */
         .styled-table thead tr { background-color: #1e293b; color: #ffffff; text-align: left; }
         .styled-table th, .styled-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
         .styled-table tbody tr:nth-of-type(even) { background-color: #f8fafc; }
-        .styled-table tbody tr:hover { background-color: #e2e8f0; }
-
-        /* Rubric Modal Styling */
         .rubric-modal { transition: opacity 0.3s ease; }
         .rubric-modal.hidden { opacity: 0; pointer-events: none; }
         .rubric-modal:not(.hidden) { opacity: 1; pointer-events: auto; }
-        
-        /* Rubric Table Specifics */
-        .rubric-table th { background-color: #e2e8f0; color: #1e293b; font-weight: bold; border: 1px solid #cbd5e1; }
+        .rubric-table th { background-color: #e2e8f0; border: 1px solid #cbd5e1; }
         .rubric-table td { border: 1px solid #e2e8f0; vertical-align: top; padding: 8px; font-size: 0.85rem; }
         .bg-level-5 { background-color: #d1fae5; } 
         .bg-level-4 { background-color: #dbeafe; } 
@@ -60,13 +44,12 @@
         <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-4"></div>
         <p id="loader-text" class="text-gray-700 font-bold animate-pulse">Sedang memproses...</p>
     </div>
-
     <div id="toast-container"></div>
 
     <div id="rubric-modal" class="rubric-modal hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
             <div class="bg-green-700 text-white p-4 flex justify-between items-center shrink-0">
-                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-book-open"></i> Rubrik Pemarkahan Amali HP3 (5 Peringkat)</h3>
+                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-book-open"></i> Rubrik Amali HP3 (5 Peringkat)</h3>
                 <button onclick="toggleRubric(false)" class="hover:bg-green-600 p-2 rounded-full transition"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="flex border-b bg-gray-50 shrink-0">
@@ -80,92 +63,26 @@
                         <table class="w-full rubric-table border-collapse">
                             <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
                             <tbody>
-                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Blok betul tanpa bantuan. Posisi dekam sempurna. Punggung tinggi dari kepala, berat ke hadapan.</td></tr>
-                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Blok betul. Posisi dekam betul. Punggung tidak terlalu tinggi.</td></tr>
-                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Blok hampir betul. Posisi dekam minima kesalahan. Punggung sama aras kepala.</td></tr>
-                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Blok kesalahan kecil/bantuan. Punggung kurang tinggi. Teknik kurang betul.</td></tr>
-                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Blok bantuan penuh. Posisi salah. Punggung tidak tinggi.</td></tr>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Blok betul tanpa bantuan. Posisi dekam sempurna.</td></tr>
+                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Blok betul. Posisi dekam betul.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Blok hampir betul. Posisi dekam minima kesalahan.</td></tr>
+                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Blok kesalahan kecil/bantuan. Teknik kurang betul.</td></tr>
+                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Blok bantuan penuh. Posisi salah.</td></tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Larian (10%)</h4>
-                        <table class="w-full rubric-table border-collapse">
-                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
-                            <tbody>
-                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Tindak balas pantas. Tolakan maksimum. Koordinasi selaras.</td></tr>
-                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Tindak balas pantas. Tolakan maksimum (sedikit lonjak). Koordinasi betul.</td></tr>
-                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Tindak balas agak pantas. Tolakan agak maksimum. Koordinasi agak betul.</td></tr>
-                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Tindak balas kurang pantas. Koordinasi kurang sempurna.</td></tr>
-                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Tindak balas lambat. Tiada koordinasi.</td></tr>
-                            </tbody>
-                        </table>
                     </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Penamat (5%)</h4>
-                        <table class="w-full rubric-table border-collapse">
-                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
-                            <tbody>
-                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Melintasi dengan 'Torso'. Dipping tangan ke belakang. Kekal kepantasan.</td></tr>
-                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Melintasi dengan 'Torso'. Dipping tangan ke belakang. Teknik betul.</td></tr>
-                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Melintasi dengan 'Torso'. Dipping tangan dihayun. Agak mengekalkan kepantasan.</td></tr>
-                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Dipping tanpa tangan dihayun. Tidak mengekalkan kepantasan.</td></tr>
-                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Berhenti serta merta. Tidak membuat dipping.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
                 <div id="rubric-content-padang" class="hidden space-y-6">
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                         <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Persediaan (5%)</h4>
                         <table class="w-full rubric-table border-collapse">
                             <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
                             <tbody>
-                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Peluru tidak sentuh tapak tangan. Sentuh sisi leher. Membelakangkan kawasan.</td></tr>
+                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Peluru tidak sentuh tapak tangan. Sentuh sisi leher.</td></tr>
                                 <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Kriteria sama seperti Amat Cemerlang tetapi dilakukan dengan baik.</td></tr>
-                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Peluru tidak sentuh sisi leher dengan tepat. Teknik betul perlu dibaiki.</td></tr>
+                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Peluru tidak sentuh sisi leher dengan tepat.</td></tr>
                                 <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Tidak memegang di pangkal jari. Kedudukan peluru salah.</td></tr>
                                 <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Teknik salah sepenuhnya.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Lungsuran (5%)</h4>
-                        <table class="w-full rubric-table border-collapse">
-                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
-                            <tbody>
-                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Lungsur serentak. Kaki dalam bulatan. Pantas dan licin.</td></tr>
-                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Lungsur serentak. Kurang pantas dan licin.</td></tr>
-                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Lungsur serentak. Kurang pantas. Teknik perlu dibaiki.</td></tr>
-                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Tidak serentak. Kaki tidak dalam bulatan. Tidak pantas.</td></tr>
-                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Teknik salah sepenuhnya.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Lontaran (10%)</h4>
-                        <table class="w-full rubric-table border-collapse">
-                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
-                            <tbody>
-                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td><td>Pinggul pusing kiri/atas serentak. Tolak lurus lutut. Mula dari bahu, ikut lajak.</td></tr>
-                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td><td>Pinggul pusing serentak. Tolak lurus lutut. Teknik betul.</td></tr>
-                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td><td>Pinggul kurang dipusingkan. Kurang menolak lutut.</td></tr>
-                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td><td>Kurang pemindahan berat. Teknik betul perlu dibaiki.</td></tr>
-                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td><td>Pinggul tidak dipusingkan. Teknik salah.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">4. Fasa Pulihan (5%)</h4>
-                        <table class="w-full rubric-table border-collapse">
-                            <thead><tr><th class="w-1/6">Tahap</th><th class="w-1/6">Markah</th><th>Kriteria</th></tr></thead>
-                            <tbody>
-                                <tr class="bg-level-5"><td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td><td>Imbang badan. Ikut lajak. Kaki kanan ke hadapan & bengkok tepat.</td></tr>
-                                <tr class="bg-level-4"><td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td><td>Imbang badan. Teknik baik.</td></tr>
-                                <tr class="bg-level-3"><td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td><td>Kurang imbang. Kaki kanan dibawa ke hadapan pada masa yang sama.</td></tr>
-                                <tr class="bg-level-2"><td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td><td>Kaki kanan dibawa ke hadapan pada masa tidak sama.</td></tr>
-                                <tr class="bg-level-1"><td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td><td>Tidak berjaya imbang. Tiada ikut lajak.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -179,214 +96,139 @@
 
     <div id="login-view" class="fixed inset-0 login-bg z-[60] flex items-center justify-center p-4">
         <div class="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-yellow-500 relative z-10">
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4">
-                    <i class="fas fa-graduation-cap text-3xl"></i>
-                </div>
-                <h1 class="text-3xl font-extrabold text-slate-800">MPU3411</h1>
-                <p class="text-slate-500 font-medium">Sistem Pengurusan Markah</p>
-            </div>
+            <h1 class="text-3xl font-extrabold text-slate-800 text-center mb-2">MPU3411</h1>
+            <p class="text-slate-500 font-medium text-center mb-8">Sistem Pengurusan Markah MPU3411</p>
             <form id="login-form" class="space-y-5">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Emel Rasmi</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-3 text-gray-400"><i class="fas fa-envelope"></i></span>
-                        <input type="email" id="email" class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="nama@organisasi.com" required>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Kata Laluan</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-3 text-gray-400"><i class="fas fa-lock"></i></span>
-                        <input type="password" id="password" class="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="••••••••" required>
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg transition transform hover:scale-[1.02]">LOG MASUK</button>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1">Emel Rasmi</label><input type="email" id="email" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required></div>
+                <div><label class="block text-sm font-bold text-slate-700 mb-1">Kata Laluan</label><input type="password" id="password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required></div>
+                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg">LOG MASUK</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Versi 3.0 | Fix Pengiraan Kelas</p>
         </div>
     </div>
 
     <div id="app-container" class="hidden">
         <header class="fixed-header bg-slate-900 text-white shadow-xl flex flex-col justify-center">
-            <div class="px-4 md:px-6 flex justify-between items-center h-full max-w-7xl mx-auto w-full">
+            <div class="px-6 flex justify-between items-center h-full max-w-7xl mx-auto w-full">
                 <div class="flex items-center gap-3">
-                    <div class="bg-yellow-500 text-slate-900 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl shadow">M</div>
-                    <div>
-                        <h1 class="text-lg md:text-xl font-bold tracking-tight">MPU3411 SEM II</h1>
-                        <p class="text-[10px] md:text-xs text-slate-400">Pengguna: <span id="user-display-name" class="font-bold text-white">...</span> | <span id="user-role-display" class="uppercase text-yellow-400">...</span></p>
-                    </div>
+                    <div class="bg-yellow-500 text-slate-900 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl">M</div>
+                    <div><h1 class="text-xl font-bold">MPU3411 OLAHRAGA IPGKDA</h1><p class="text-xs text-slate-600">Pengguna: <span id="user-display-name">...</span> | <span id="user-role-display">...</span></p></div>
                 </div>
-                <button onclick="logout()" class="bg-red-600/90 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition flex items-center gap-2">
-                    <i class="fas fa-sign-out-alt"></i> <span class="hidden md:inline">KELUAR</span>
-                </button>
+                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold">KELUAR</button>
             </div>
         </header>
 
-        <div class="fixed top-[70px] left-0 right-0 bg-white z-40 border-b border-gray-200 shadow-sm">
-            <nav class="flex px-4 py-2 space-x-2 overflow-x-auto max-w-7xl mx-auto hide-scrollbar">
-                <button onclick="nav('dashboard')" id="btn-dashboard" class="nav-btn active px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap"><i class="fas fa-chart-pie"></i> Dashboard</button>
-                <button onclick="nav('ujian')" id="btn-ujian" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap text-gray-600 hover:bg-gray-100"><i class="fas fa-file-alt"></i> Ujian (30%)</button>
-                <button onclick="nav('hp3')" id="btn-hp3" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap text-gray-600 hover:bg-gray-100"><i class="fas fa-running"></i> Amali HP3 (50%)</button>
-                <button onclick="nav('hp7')" id="btn-hp7" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 whitespace-nowrap text-gray-600 hover:bg-gray-100"><i class="fas fa-tools"></i> HP7 (20%)</button>
+        <div class="fixed top-[70px] left-0 right-0 bg-white z-40 border-b shadow-sm">
+            <nav class="flex px-4 py-2 space-x-2 overflow-x-auto max-w-7xl mx-auto">
+                <button onclick="nav('dashboard')" id="btn-dashboard" class="nav-btn active px-4 py-2 rounded-lg text-sm font-bold bg-blue-100 text-blue-700 transition">Dashboard</button>
+                <button onclick="nav('ujian')" id="btn-ujian" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">Ujian (30%)</button>
+                <button onclick="nav('hp3')" id="btn-hp3" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">Amali HP3 (50%)</button>
+                <button onclick="nav('hp7')" id="btn-hp7" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">HP7 (20%)</button>
             </nav>
         </div>
 
         <div class="main-content-area max-w-7xl mx-auto px-4">
+            
             <section id="dashboard" class="content-section block">
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg mb-6 text-sm flex items-center gap-3">
-                    <i class="fas fa-info-circle text-xl"></i>
-                    <div><strong>Info:</strong> Statistik di bawah hanya menunjukkan data bagi kelas anda: <span id="user-class-badge" class="font-bold underline">...</span></div>
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg mb-6 text-sm">
+                    <strong>Info:</strong> Data dipaparkan untuk kelas: <span id="user-class-badge" class="font-bold underline">...</span>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition"><i class="fas fa-users text-6xl text-slate-800"></i></div>
-                        <h3 class="text-xs font-bold text-slate-500 uppercase">Jumlah Pelajar</h3>
-                        <p class="text-3xl font-extrabold text-slate-800 mt-2" id="dash-total">0</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl border border-blue-100 shadow-sm relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition"><i class="fas fa-file-alt text-6xl text-blue-600"></i></div>
-                        <h3 class="text-xs font-bold text-blue-600 uppercase">Ujian Selesai</h3>
-                        <p class="text-3xl font-extrabold text-blue-700 mt-2" id="dash-ujian">0</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl border border-green-100 shadow-sm relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition"><i class="fas fa-running text-6xl text-green-600"></i></div>
-                        <h3 class="text-xs font-bold text-green-600 uppercase">HP3 Selesai</h3>
-                        <p class="text-3xl font-extrabold text-green-700 mt-2" id="dash-hp3">0</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl border border-yellow-100 shadow-sm relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition"><i class="fas fa-tools text-6xl text-yellow-600"></i></div>
-                        <h3 class="text-xs font-bold text-yellow-600 uppercase">HP7 Selesai</h3>
-                        <p class="text-3xl font-extrabold text-yellow-700 mt-2" id="dash-hp7">0</p>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white p-5 rounded-xl border shadow-sm"><h3 class="text-xs font-bold text-slate-500">JUMLAH PELAJAR</h3><p class="text-3xl font-extrabold mt-2" id="dash-total">0</p></div>
+                    <div class="bg-white p-5 rounded-xl border shadow-sm border-blue-100"><h3 class="text-xs font-bold text-blue-600">UJIAN SELESAI</h3><p class="text-3xl font-extrabold text-blue-700 mt-2" id="dash-ujian">0</p></div>
+                    <div class="bg-white p-5 rounded-xl border shadow-sm border-green-100"><h3 class="text-xs font-bold text-green-600">HP3 SELESAI</h3><p class="text-3xl font-extrabold text-green-700 mt-2" id="dash-hp3">0</p></div>
+                    <div class="bg-white p-5 rounded-xl border shadow-sm border-yellow-100"><h3 class="text-xs font-bold text-yellow-600">HP7 SELESAI</h3><p class="text-3xl font-extrabold text-yellow-700 mt-2" id="dash-hp7">0</p></div>
                 </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                        <h3 class="font-bold text-gray-800 flex items-center gap-2"><i class="fas fa-list"></i> Ringkasan Prestasi Pelajar</h3>
-                        <select id="dash-filter-class" onchange="renderDashboardTable()" class="text-xs p-2 border rounded bg-white font-semibold outline-none focus:ring-1 focus:ring-blue-500">
-                            </select>
+                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800">Ringkasan Prestasi</h3>
+                        <select id="dash-filter-class" onchange="renderDashboardTable()" class="text-xs p-2 border rounded font-semibold focus:outline-none"></select>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full styled-table text-sm">
-                            <thead>
-                                <tr>
-                                    <th>Nama Pelajar</th>
-                                    <th>Kelas</th>
-                                    <th class="text-center">Ujian (30%)</th>
-                                    <th class="text-center">HP3 (50%)</th>
-                                    <th class="text-center">HP7 (20%)</th>
-                                    <th class="text-center">Jumlah</th>
-                                    <th class="text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dashboard-table-body">
-                                <tr><td colspan="7" class="text-center py-4 text-gray-500">Memuatkan data...</td></tr>
-                            </tbody>
+                            <thead><tr><th>Nama Pelajar</th><th>Kelas</th><th class="text-center">Ujian (30%)</th><th class="text-center">HP3 (50%)</th><th class="text-center">HP7 (20%)</th><th class="text-center">Jumlah</th><th class="text-center">Status</th></tr></thead>
+                            <tbody id="dashboard-table-body"><tr><td colspan="7" class="text-center py-4 text-gray-500">Memuatkan data...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
             <section id="ujian" class="content-section">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center border-b pb-4"><i class="fas fa-file-alt text-blue-600 mr-3"></i> Markah Ujian (30%)</h2>
+                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center"><i class="fas fa-file-alt text-blue-600 mr-2"></i> Ujian (30%)</h2>
                     <form id="form-ujian" onsubmit="handleFormSubmit(event, 'MARKAH_UJIAN')">
-                        <div class="bg-blue-50/50 p-5 rounded-lg border border-blue-100 mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih Kelas</label><select id="sel-class-ujian" onchange="filterStudents('ujian')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition"></select></div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cari / Pilih Pelajar</label>
-                                <input type="text" id="search-student-ujian" onkeyup="searchDropdown('ujian')" placeholder="Taip nama..." class="w-full p-2 mb-1 text-xs border border-gray-300 rounded bg-white focus:outline-none focus:border-blue-500">
-                                <select id="sel-student-ujian" onchange="loadStudentData('ujian')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" disabled></select>
-                            </div>
-                            <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Penuh</label><input type="text" id="name-ujian" class="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-gray-700 cursor-not-allowed" readonly><input type="hidden" name="ID_SISTEM" id="id-ujian"><input type="hidden" name="Nama_Pelajar" id="hidden-name-ujian"><input type="hidden" name="Kelas" id="class-ujian"></div>
+                        <div class="bg-blue-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-ujian" onchange="filterStudents('ujian')" class="w-full p-2 border rounded"></select></div>
+                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-ujian" onkeyup="searchDropdown('ujian')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-ujian" onchange="loadStudentData('ujian')" class="w-full p-2 border rounded" disabled></select></div>
+                            <div class="md:col-span-2"><input type="text" id="name-ujian" class="w-full p-2 bg-gray-100 border rounded font-bold" readonly><input type="hidden" name="ID_SISTEM" id="id-ujian"><input type="hidden" name="Nama_Pelajar" id="hidden-name-ujian"><input type="hidden" name="Kelas" id="class-ujian"></div>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-                            <div><label class="text-xs font-bold text-gray-600 block mb-1">S1(a) [Max 5]</label><input type="number" name="S1A_Markah" class="score-in w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none" step="0.1" max="5"></div>
-                            <div><label class="text-xs font-bold text-gray-600 block mb-1">S1(b) [Max 5]</label><input type="number" name="S1B_Markah" class="score-in w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none" step="0.1" max="5"></div>
-                            <div><label class="text-xs font-bold text-gray-600 block mb-1">S2(a) [Max 5]</label><input type="number" name="S2A_Markah" class="score-in w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none" step="0.1" max="5"></div>
-                            <div><label class="text-xs font-bold text-gray-600 block mb-1">S2(b) [Max 5]</label><input type="number" name="S2B_Markah" class="score-in w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none" step="0.1" max="5"></div>
-                            <div><label class="text-xs font-bold text-gray-600 block mb-1">S1(c) [Max 10]</label><input type="number" name="S1C_Markah" class="score-in w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 outline-none" step="0.1" max="10"></div>
+                        <div class="grid grid-cols-5 gap-2 mb-4">
+                            <div><label class="text-xs font-bold block mb-1">S1(a) [5]</label><input type="number" name="S1A_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
+                            <div><label class="text-xs font-bold block mb-1">S1(b) [5]</label><input type="number" name="S1B_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
+                            <div><label class="text-xs font-bold block mb-1">S2(a) [5]</label><input type="number" name="S2A_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
+                            <div><label class="text-xs font-bold block mb-1">S2(b) [5]</label><input type="number" name="S2B_Markah" class="score-in w-full border p-2 text-center" max="5"></div>
+                            <div><label class="text-xs font-bold block mb-1">S1(c) [10]</label><input type="number" name="S1C_Markah" class="score-in w-full border p-2 text-center" max="10"></div>
                         </div>
-                        <div class="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 gap-4">
-                            <div class="text-lg font-bold text-gray-700 bg-gray-50 px-4 py-2 rounded-lg border">Jumlah: <span id="total-ujian" class="text-blue-600 text-2xl ml-2">0</span> <span class="text-gray-400 text-sm">/ 30</span></div>
-                            <input type="hidden" name="Jumlah_Ujian" id="val-total-ujian">
-                            <button type="submit" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition transform active:scale-95 flex items-center justify-center gap-2"><i class="fas fa-save"></i> SIMPAN MARKAH</button>
-                        </div>
+                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-ujian" class="text-blue-600 text-xl">0</span> / 30</div><input type="hidden" name="Jumlah_Ujian" id="val-total-ujian"><button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
                     </form>
                 </div>
             </section>
 
             <section id="hp3" class="content-section">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 max-w-4xl mx-auto">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 mb-6 gap-4">
-                        <h2 class="text-2xl font-bold text-slate-800 flex items-center"><i class="fas fa-running text-green-600 mr-3"></i> Amali HP3 (50%)</h2>
-                        <button onclick="toggleRubric(true)" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow transition flex items-center gap-2"><i class="fas fa-list-alt"></i> LIHAT RUBRIK</button>
+                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
+                    <div class="flex justify-between items-center border-b pb-4 mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800 flex items-center"><i class="fas fa-running text-green-600 mr-2"></i> Amali HP3 (50%)</h2>
+                        <button onclick="toggleRubric(true)" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-700">LIHAT RUBRIK</button>
                     </div>
                     <form id="form-hp3" onsubmit="handleFormSubmit(event, 'MARKAH_AMALI_HP3')">
-                        <div class="bg-green-50/50 p-5 rounded-lg border border-green-100 mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih Kelas</label><select id="sel-class-hp3" onchange="filterStudents('hp3')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-green-500 outline-none"></select></div>
-                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cari / Pilih Pelajar</label><input type="text" id="search-student-hp3" onkeyup="searchDropdown('hp3')" placeholder="Taip nama..." class="w-full p-2 mb-1 text-xs border border-gray-300 rounded bg-white focus:outline-none focus:border-green-500"><select id="sel-student-hp3" onchange="loadStudentData('hp3')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-green-500 outline-none" disabled></select></div>
-                            <div class="md:col-span-2"><input type="text" id="name-hp3" class="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-gray-700 cursor-not-allowed" readonly><input type="hidden" name="ID_SISTEM" id="id-hp3"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp3"><input type="hidden" name="Kelas" id="class-hp3"></div>
+                        <div class="bg-green-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-hp3" onchange="filterStudents('hp3')" class="w-full p-2 border rounded"></select></div>
+                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-hp3" onkeyup="searchDropdown('hp3')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-hp3" onchange="loadStudentData('hp3')" class="w-full p-2 border rounded" disabled></select></div>
+                            <div class="md:col-span-2"><input type="text" id="name-hp3" class="w-full p-2 bg-gray-100 border rounded font-bold" readonly><input type="hidden" name="ID_SISTEM" id="id-hp3"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp3"><input type="hidden" name="Kelas" id="class-hp3"></div>
                         </div>
-                        <div class="mb-6">
-                            <h3 class="bg-green-100 text-green-800 px-4 py-1.5 font-bold text-sm rounded-lg mb-3 inline-flex items-center gap-2"><i class="fas fa-stopwatch"></i> Balapan</h3>
-                            <div class="grid grid-cols-3 gap-4">
-                                <div><label class="text-xs block mb-1">Permulaan [10]</label><input type="number" name="HP3_Permulaan_10" class="score-in-hp3 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-green-500" step="0.1" max="10"></div>
-                                <div><label class="text-xs block mb-1">Larian [10]</label><input type="number" name="HP3_Larian_10" class="score-in-hp3 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-green-500" step="0.1" max="10"></div>
-                                <div><label class="text-xs block mb-1">Penamat [5]</label><input type="number" name="HP3_Penamat_5" class="score-in-hp3 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-green-500" step="0.1" max="5"></div>
+                        <div class="mb-4"><h3 class="bg-green-100 px-2 py-1 text-xs font-bold rounded inline-block mb-2">Balapan</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div><label class="text-xs block">Permulaan [10]</label><input type="number" name="HP3_Permulaan_10" class="score-in-hp3 w-full border p-2 text-center" max="10"></div>
+                                <div><label class="text-xs block">Larian [10]</label><input type="number" name="HP3_Larian_10" class="score-in-hp3 w-full border p-2 text-center" max="10"></div>
+                                <div><label class="text-xs block">Penamat [5]</label><input type="number" name="HP3_Penamat_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
                             </div>
                         </div>
-                        <div class="mb-6">
-                            <h3 class="bg-green-100 text-green-800 px-4 py-1.5 font-bold text-sm rounded-lg mb-3 inline-flex items-center gap-2"><i class="fas fa-futbol"></i> Padang</h3>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div><label class="text-xs block mb-1">Persediaan [5]</label><input type="number" name="HP3_Persediaan_5" class="score-in-hp3 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-green-500" step="0.1" max="5"></div>
-                                <div><label class="text-xs block mb-1">Lungsuran [5]</label><input type="number" name="HP3_Lungsuran_5" class="score-in-hp3 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-green-500" step="0.1" max="5"></div>
-                                <div><label class="text-xs block mb-1">Lontaran [10]</label><input type="number" name="HP3_Lontaran_10" class="score-in-hp3 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-green-500" step="0.1" max="10"></div>
-                                <div><label class="text-xs block mb-1">Pulihan [5]</label><input type="number" name="HP3_Pulihan_5" class="score-in-hp3 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-green-500" step="0.1" max="5"></div>
+                        <div class="mb-4"><h3 class="bg-green-100 px-2 py-1 text-xs font-bold rounded inline-block mb-2">Padang</h3>
+                            <div class="grid grid-cols-4 gap-2">
+                                <div><label class="text-xs block">Sedia [5]</label><input type="number" name="HP3_Persediaan_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
+                                <div><label class="text-xs block">Lungsur [5]</label><input type="number" name="HP3_Lungsuran_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
+                                <div><label class="text-xs block">Lontar [10]</label><input type="number" name="HP3_Lontaran_10" class="score-in-hp3 w-full border p-2 text-center" max="10"></div>
+                                <div><label class="text-xs block">Pulih [5]</label><input type="number" name="HP3_Pulihan_5" class="score-in-hp3 w-full border p-2 text-center" max="5"></div>
                             </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 gap-4">
-                            <div class="text-lg font-bold text-gray-700 bg-gray-50 px-4 py-2 rounded-lg border">Jumlah: <span id="total-hp3" class="text-green-600 text-2xl ml-2">0</span> <span class="text-gray-400 text-sm">/ 50</span></div>
-                            <input type="hidden" name="Jumlah_HP3" id="val-total-hp3">
-                            <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition transform active:scale-95 flex items-center justify-center gap-2"><i class="fas fa-save"></i> SIMPAN MARKAH</button>
-                        </div>
+                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-hp3" class="text-green-600 text-xl">0</span> / 50</div><input type="hidden" name="Jumlah_HP3" id="val-total-hp3"><button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
                     </form>
                 </div>
             </section>
 
             <section id="hp7" class="content-section">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center border-b pb-4"><i class="fas fa-tools text-yellow-500 mr-3"></i> Penyediaan HP7 (20%)</h2>
+                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center"><i class="fas fa-tools text-yellow-600 mr-2"></i> HP7 (20%)</h2>
                     <form id="form-hp7" onsubmit="handleFormSubmit(event, 'MARKAH_HP7')">
-                        <div class="bg-yellow-50/50 p-5 rounded-lg border border-yellow-100 mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih Kelas</label><select id="sel-class-hp7" onchange="filterStudents('hp7')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-yellow-500 outline-none"></select></div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cari / Pilih Pelajar</label>
-                                <input type="text" id="search-student-hp7" onkeyup="searchDropdown('hp7')" placeholder="Taip nama..." class="w-full p-2 mb-1 text-xs border border-gray-300 rounded bg-white focus:outline-none focus:border-yellow-500">
-                                <select id="sel-student-hp7" onchange="loadStudentData('hp7')" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg font-semibold focus:ring-2 focus:ring-yellow-500 outline-none" disabled></select>
-                            </div>
-                            <div class="md:col-span-2"><input type="text" id="name-hp7" class="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg font-bold text-gray-700 cursor-not-allowed" readonly><input type="hidden" name="ID_SISTEM" id="id-hp7"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp7"><input type="hidden" name="Kelas" id="class-hp7"></div>
+                        <div class="bg-yellow-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-hp7" onchange="filterStudents('hp7')" class="w-full p-2 border rounded"></select></div>
+                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-hp7" onkeyup="searchDropdown('hp7')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-hp7" onchange="loadStudentData('hp7')" class="w-full p-2 border rounded" disabled></select></div>
+                            <div class="md:col-span-2"><input type="text" id="name-hp7" class="w-full p-2 bg-gray-100 border rounded font-bold" readonly><input type="hidden" name="ID_SISTEM" id="id-hp7"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp7"><input type="hidden" name="Kelas" id="class-hp7"></div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div><label class="text-xs font-bold text-gray-600 block mb-1">Penyediaan Trek [Max 10]</label><input type="number" name="HP7_Penyediaan_Trek_10" class="score-in-hp7 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-yellow-500" step="0.1" max="10"></div>
-                            <div><label class="text-xs font-bold text-gray-600 block mb-1">Penyediaan Sektor [Max 10]</label><input type="number" name="HP7_Penyediaan_Sektor_10" class="score-in-hp7 w-full border border-gray-300 p-2.5 rounded-lg text-center font-bold focus:ring-2 focus:ring-yellow-500" step="0.1" max="10"></div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div><label class="text-xs font-bold block mb-1">Penyediaan Trek [10]</label><input type="number" name="HP7_Penyediaan_Trek_10" class="score-in-hp7 w-full border p-2 text-center" max="10"></div>
+                            <div><label class="text-xs font-bold block mb-1">Penyediaan Sektor [10]</label><input type="number" name="HP7_Penyediaan_Sektor_10" class="score-in-hp7 w-full border p-2 text-center" max="10"></div>
                         </div>
-                        <div class="flex flex-col sm:flex-row justify-between items-center border-t border-gray-100 pt-6 gap-4">
-                            <div class="text-lg font-bold text-gray-700 bg-gray-50 px-4 py-2 rounded-lg border">Jumlah: <span id="total-hp7" class="text-yellow-600 text-2xl ml-2">0</span> <span class="text-gray-400 text-sm">/ 20</span></div>
-                            <input type="hidden" name="Jumlah_HP7" id="val-total-hp7">
-                            <button type="submit" class="w-full sm:w-auto bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition transform active:scale-95 flex items-center justify-center gap-2"><i class="fas fa-save"></i> SIMPAN MARKAH</button>
-                        </div>
+                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-hp7" class="text-yellow-600 text-xl">0</span> / 20</div><input type="hidden" name="Jumlah_HP7" id="val-total-hp7"><button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
                     </form>
                 </div>
             </section>
+
         </div>
     </div>
 
     <script>
         // ============================================
-        // PASTE URL DEPLOYMENT APPS SCRIPT ANDA DI SINI
+        // PASTE URL ANDA DI SINI
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJSoyfmId5JEUyTfu-IIJqDdjLfQ6OxtiZdPQqMOBlx3w75Mdf09JCeaD2l-LBTyd1/exec";
         // ============================================
 
@@ -395,72 +237,60 @@
         let existingScores = {};
         let filteredStudentsCache = [];
 
-        // --- RUBRIC LOGIC ---
-        function toggleRubric(show) {
-            const modal = document.getElementById('rubric-modal');
-            show ? modal.classList.remove('hidden') : modal.classList.add('hidden');
+        // --- DATA NORMALIZER (Fix undefined/case mismatch) ---
+        function normalizeData(students) {
+            return students.map(s => {
+                // Cari key yang mungkin berbeza (Case Sensitive: Kelas vs KELAS)
+                const kelas = s.Kelas || s.KELAS || s.kelas || "TIADA KELAS";
+                const nama = s.Nama_Pelajar || s.NAMA_PELAJAR || s.Nama || "TIADA NAMA";
+                const id = s.ID_SISTEM || s.ID || s.id_sistem || "";
+                
+                return { ...s, Kelas: kelas.toString().trim(), Nama_Pelajar: nama, ID_SISTEM: id };
+            });
         }
-        function switchRubricTab(tabName) {
-            document.getElementById('rubric-content-balapan').classList.add('hidden');
-            document.getElementById('rubric-content-padang').classList.add('hidden');
-            document.getElementById('tab-btn-balapan').classList.replace('text-green-700', 'text-gray-500');
-            document.getElementById('tab-btn-padang').classList.replace('text-green-700', 'text-gray-500');
-            
-            if(tabName === 'balapan') {
-                document.getElementById('rubric-content-balapan').classList.remove('hidden');
-                document.getElementById('tab-btn-balapan').classList.replace('text-gray-500', 'text-green-700');
-            } else {
-                document.getElementById('rubric-content-padang').classList.remove('hidden');
-                document.getElementById('tab-btn-padang').classList.replace('text-gray-500', 'text-green-700');
-            }
-        }
-        document.getElementById('rubric-modal').addEventListener('click', function(e) { if(e.target===this) toggleRubric(false); });
 
-        // --- NAVIGATION ---
+        // --- HELPER UNTUK BERSIHKAN DATA NOMBOR (ANTI-CRASH) ---
+        function cleanNumber(val) {
+            if (val === "#N/A" || val === "" || val === null || val === undefined) return 0;
+            const num = parseFloat(val);
+            return isNaN(num) ? 0 : num;
+        }
+
+        // --- RUBRIC LOGIC ---
+        function toggleRubric(show) { document.getElementById('rubric-modal').classList.toggle('hidden', !show); }
+        function switchRubricTab(tabName) {
+            document.getElementById('rubric-content-balapan').classList.toggle('hidden', tabName !== 'balapan');
+            document.getElementById('rubric-content-padang').classList.toggle('hidden', tabName !== 'padang');
+            document.getElementById('tab-btn-balapan').className = tabName === 'balapan' ? "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition" : "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 transition";
+            document.getElementById('tab-btn-padang').className = tabName === 'padang' ? "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition" : "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 transition";
+        }
+
+        // --- NAV & UI ---
         function nav(id) {
             document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
             document.getElementById(id).style.display = 'block';
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-100', 'text-blue-700', 'active'));
-            const activeBtn = document.getElementById(`btn-${id}`);
-            if(activeBtn) activeBtn.classList.add('bg-blue-100', 'text-blue-700', 'active');
+            document.getElementById(`btn-${id}`).classList.add('bg-blue-100', 'text-blue-700', 'active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const icon = type === 'success' ? '<i class="fas fa-check-circle mr-3"></i>' : '<i class="fas fa-exclamation-circle mr-3"></i>';
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `${icon} <span>${message}</span>`;
-            container.appendChild(toast);
-            requestAnimationFrame(() => toast.classList.add('show'));
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+        function showToast(msg, type='success') {
+            const t = document.createElement('div'); t.className = `toast ${type}`;
+            t.innerHTML = `<span>${msg}</span>`; document.getElementById('toast-container').appendChild(t);
+            requestAnimationFrame(() => t.classList.add('show')); setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300) }, 3000);
         }
-
         function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
 
         // --- LOGIN ---
         document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const pass = document.getElementById('password').value.trim();
-            showLoader(true);
-            
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'login', email: email, password: pass })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.result === 'success') {
-                    currentUser = data.user;
-                    initApp();
-                } else {
-                    showToast(data.message, 'error');
-                    showLoader(false);
-                }
-            })
-            .catch(err => { showToast("Ralat sambungan server", 'error'); showLoader(false); });
+            e.preventDefault(); showLoader(true);
+            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email: document.getElementById('email').value.trim(), password: document.getElementById('password').value.trim() }) })
+            .then(res => res.json()).then(data => {
+                if (data.result === 'success') { 
+                    // Normalize user class data just in case
+                    currentUser = { ...data.user, kelas: (data.user.kelas || "ALL").toString().trim() }; 
+                    initApp(); 
+                } else { showToast(data.message, 'error'); showLoader(false); }
+            }).catch(() => { showToast("Ralat sambungan", 'error'); showLoader(false); });
         });
 
         function initApp() {
@@ -468,107 +298,73 @@
             document.getElementById('app-container').classList.remove('hidden');
             document.getElementById('user-display-name').innerText = currentUser.nama;
             document.getElementById('user-role-display').innerText = currentUser.role;
-            
-            // Set User Class Info
-            // Assuming currentUser.kelas contains the assigned class (e.g., "BM" or "BMMB1")
-            // If admin, it might be 'ALL'
-            const assignedClass = currentUser.kelas || 'SEMUA';
+            const assignedClass = currentUser.kelas || "SEMUA";
             document.getElementById('user-class-badge').innerText = assignedClass;
-
+            
             nav('dashboard');
-
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'get_data', email: currentUser.email, role: currentUser.role })
-            })
-            .then(res => res.json())
-            .then(data => {
+            
+            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'get_data', email: currentUser.email, role: currentUser.role }) })
+            .then(res => res.json()).then(data => {
                 if(data.result === 'success'){
-                    allStudents = data.data.students;
+                    // Normalize data here to prevent "undefined" error
+                    allStudents = normalizeData(data.data.students); 
                     existingScores = data.data.scores;
-                    updateDashboard(); // Now correctly filters based on user class
-                    initDropdowns('ujian');
-                    initDropdowns('hp3');
-                    initDropdowns('hp7');
-                } else {
-                    showToast(data.message, 'error');
-                }
+                    console.log("Data loaded:", allStudents); // Debug log
+                    updateDashboard(); 
+                    initDropdowns('ujian'); initDropdowns('hp3'); initDropdowns('hp7');
+                } else { showToast(data.message, 'error'); }
                 showLoader(false);
             });
         }
-
         function logout() { if(confirm("Log keluar?")) location.reload(); }
 
         // --- DASHBOARD LOGIC (FIXED) ---
         function updateDashboard() {
-            // 1. FILTER STUDENTS FIRST based on current user's class
             let targetStudents = allStudents;
-            const assignedClass = currentUser.kelas; // Ensure your login response sends 'kelas'
-
-            // If user is Lecturer and has a specific class assigned (and not ALL)
+            const assignedClass = currentUser.kelas;
+            
+            // Filter logic yang lebih robust
             if (currentUser.role === 'PENSYARAH' || (assignedClass && assignedClass !== 'ALL')) {
-                // Filter only students belonging to this lecturer's class
                 targetStudents = allStudents.filter(s => s.Kelas === assignedClass);
             }
-
-            // 2. CALCULATE STATS BASED ON FILTERED STUDENTS
+            
             const totalStudents = targetStudents.length;
-            let countUjian = 0;
-            let countHP3 = 0;
-            let countHP7 = 0;
-
-            // Loop strictly through the filtered students
+            let cU=0, cHP3=0, cHP7=0;
             targetStudents.forEach(s => {
                 const id = s.ID_SISTEM;
-                if (existingScores['MARKAH_UJIAN'] && existingScores['MARKAH_UJIAN'][id]) countUjian++;
-                if (existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][id]) countHP3++;
-                if (existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][id]) countHP7++;
+                if (existingScores['MARKAH_UJIAN'] && existingScores['MARKAH_UJIAN'][id]) cU++;
+                if (existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][id]) cHP3++;
+                if (existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][id]) cHP7++;
             });
-
-            // 3. UPDATE DOM
             document.getElementById('dash-total').innerText = totalStudents;
-            document.getElementById('dash-ujian').innerText = countUjian;
-            document.getElementById('dash-hp3').innerText = countHP3;
-            document.getElementById('dash-hp7').innerText = countHP7;
+            document.getElementById('dash-ujian').innerText = cU;
+            document.getElementById('dash-hp3').innerText = cHP3;
+            document.getElementById('dash-hp7').innerText = cHP7;
             
-            // Populate Filter Class Dropdown (Only relevant class or all if admin)
             const filterSel = document.getElementById('dash-filter-class');
-            filterSel.innerHTML = ''; // Clear prev options
-
+            filterSel.innerHTML = '';
             if (currentUser.role === 'ADMIN' || assignedClass === 'ALL') {
                  filterSel.innerHTML = '<option value="all">Semua Kelas</option>';
                  const classSet = new Set(allStudents.map(s => s.Kelas));
-                 Array.from(classSet).sort().forEach(c => {
-                    filterSel.innerHTML += `<option value="${c}">${c}</option>`;
-                 });
+                 Array.from(classSet).sort().forEach(c => filterSel.innerHTML += `<option value="${c}">${c}</option>`);
             } else {
-                // Only show assigned class for lecturer
                 filterSel.innerHTML = `<option value="${assignedClass}">${assignedClass}</option>`;
-                filterSel.disabled = true; // Lock the filter
+                filterSel.disabled = true;
             }
-
             renderDashboardTable();
         }
 
         function renderDashboardTable() {
             const tbody = document.getElementById('dashboard-table-body');
             let filterClass = document.getElementById('dash-filter-class').value;
+            if (currentUser.role !== 'ADMIN' && currentUser.kelas && currentUser.kelas !== 'ALL') filterClass = currentUser.kelas;
             
-            // Force filter if user is restricted
-            if (currentUser.role !== 'ADMIN' && currentUser.kelas && currentUser.kelas !== 'ALL') {
-                filterClass = currentUser.kelas;
-            }
-
             tbody.innerHTML = '';
+            let studentsToRender = (filterClass !== 'all') ? allStudents.filter(s => s.Kelas === filterClass) : allStudents;
 
-            let studentsToRender = allStudents;
-            if(filterClass !== 'all') {
-                studentsToRender = allStudents.filter(s => s.Kelas === filterClass);
-            }
-
-            if(studentsToRender.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500">Tiada pelajar dijumpai.</td></tr>';
-                return;
+            if(studentsToRender.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 font-bold">Tiada pelajar dijumpai. (Semak Nama Kelas di Google Sheet)</td></tr>'; 
+                return; 
             }
 
             studentsToRender.forEach(s => {
@@ -577,12 +373,9 @@
                 const sHP3 = existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][id];
                 const sHP7 = existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][id];
 
-                const getSum = (arr, indices) => {
-                    if(!arr) return 0;
-                    return indices.reduce((acc, idx) => acc + (parseFloat(arr[idx])||0), 0).toFixed(1);
-                };
+                const getSum = (arr, indices) => indices.reduce((acc, idx) => acc + cleanNumber(arr[idx]), 0).toFixed(1);
 
-                // NOTE: Adjust indices based on your actual Sheet Columns
+                // Index arrays based on column positions (Adjust if needed)
                 const valUjian = sUjian ? getSum(sUjian, [5,6,7,8,9]) : '-';
                 const valHP3 = sHP3 ? getSum(sHP3, [5,6,7,8,9,10,11]) : '-';
                 const valHP7 = sHP7 ? getSum(sHP7, [5,6]) : '-';
@@ -592,77 +385,52 @@
                 if(valHP3 !== '-') totalScore += parseFloat(valHP3);
                 if(valHP7 !== '-') totalScore += parseFloat(valHP7);
                 
-                const status = (valUjian !== '-' && valHP3 !== '-' && valHP7 !== '-') 
-                    ? '<span class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold">Lengkap</span>' 
-                    : '<span class="px-2 py-1 rounded bg-gray-100 text-gray-500 text-xs font-bold">Dalam Proses</span>';
+                const isComplete = (valUjian !== '-' && valHP3 !== '-' && valHP7 !== '-');
+                const status = isComplete ? '<span class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold">Lengkap</span>' : '<span class="px-2 py-1 rounded bg-gray-100 text-gray-500 text-xs font-bold">Dalam Proses</span>';
 
-                const row = `<tr>
-                    <td class="font-bold text-slate-700">${s.Nama_Pelajar}</td>
-                    <td><span class="bg-gray-100 px-2 py-1 rounded text-xs font-bold">${s.Kelas}</span></td>
-                    <td class="text-center">${valUjian}</td>
-                    <td class="text-center">${valHP3}</td>
-                    <td class="text-center">${valHP7}</td>
-                    <td class="text-center font-bold text-blue-600">${totalScore > 0 ? totalScore.toFixed(1) : '-'}</td>
-                    <td class="text-center">${status}</td>
-                </tr>`;
-                tbody.innerHTML += row;
+                tbody.innerHTML += `<tr><td class="font-bold text-slate-700">${s.Nama_Pelajar}</td><td>${s.Kelas}</td><td class="text-center">${valUjian}</td><td class="text-center">${valHP3}</td><td class="text-center">${valHP7}</td><td class="text-center font-bold text-blue-600">${totalScore > 0 ? totalScore.toFixed(1) : '-'}</td><td class="text-center">${status}</td></tr>`;
             });
         }
 
-        // --- FORM HELPERS ---
+        // --- FORMS ---
         function initDropdowns(suffix) {
             const sel = document.getElementById(`sel-class-${suffix}`);
             sel.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-            
-            // Filter dropdown options based on user role
             let classesToShow = new Set(allStudents.map(s => s.Kelas));
-            
             if (currentUser.role !== 'ADMIN' && currentUser.kelas && currentUser.kelas !== 'ALL') {
-                // If lecturer, only show their class
                 sel.innerHTML = `<option value="${currentUser.kelas}">${currentUser.kelas}</option>`;
-                sel.value = currentUser.kelas; // Auto-select
-                filterStudents(suffix); // Auto-trigger student load
+                sel.value = currentUser.kelas; filterStudents(suffix);
             } else {
-                // If Admin, show all
-                Array.from(classesToShow).sort().forEach(c => {
-                    sel.innerHTML += `<option value="${c}">${c}</option>`;
-                });
+                Array.from(classesToShow).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
             }
         }
-
         function filterStudents(suffix) {
             const cls = document.getElementById(`sel-class-${suffix}`).value;
             const studentSel = document.getElementById(`sel-student-${suffix}`);
-            const searchInput = document.getElementById(`search-student-${suffix}`);
             studentSel.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
-            searchInput.value = '';
+            document.getElementById(`search-student-${suffix}`).value = '';
             if(!cls) { studentSel.disabled = true; filteredStudentsCache = []; return; }
             studentSel.disabled = false;
             filteredStudentsCache = allStudents.filter(s => s.Kelas === cls);
             populateStudentDropdown(suffix, filteredStudentsCache);
         }
-
         function populateStudentDropdown(suffix, students) {
             const studentSel = document.getElementById(`sel-student-${suffix}`);
             studentSel.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
             students.forEach(s => {
-                const isDone = checkDone(suffix, s.ID_SISTEM);
-                const mark = isDone ? '✅ ' : '';
+                const mark = checkDone(suffix, s.ID_SISTEM) ? '✅ ' : '';
                 studentSel.innerHTML += `<option value="${s.ID_SISTEM}">${mark}${s.Nama_Pelajar}</option>`;
             });
         }
-
         function searchDropdown(suffix) {
             const query = document.getElementById(`search-student-${suffix}`).value.toLowerCase();
             const filtered = filteredStudentsCache.filter(s => s.Nama_Pelajar.toLowerCase().includes(query));
             populateStudentDropdown(suffix, filtered);
         }
-
         function checkDone(suffix, id) {
             let sheet = suffix === 'ujian' ? 'MARKAH_UJIAN' : suffix === 'hp3' ? 'MARKAH_AMALI_HP3' : 'MARKAH_HP7';
             return existingScores[sheet] && existingScores[sheet][id];
         }
-
         function loadStudentData(suffix) {
             const id = document.getElementById(`sel-student-${suffix}`).value;
             if (!id) return;
@@ -673,75 +441,43 @@
                 document.getElementById(`id-${suffix}`).value = student.ID_SISTEM;
                 document.getElementById(`class-${suffix}`).value = student.Kelas;
                 let sheetKey = suffix === 'ujian' ? 'MARKAH_UJIAN' : suffix === 'hp3' ? 'MARKAH_AMALI_HP3' : 'MARKAH_HP7';
-                document.querySelectorAll(`#form-${suffix} input[type=number]`).forEach(i => { i.value = ''; i.classList.remove('border-red-500', 'bg-red-50'); });
+                document.querySelectorAll(`#form-${suffix} input[type=number]`).forEach(i => { i.value = ''; i.classList.remove('border-red-500'); });
                 calculateTotal(suffix);
                 if (existingScores[sheetKey] && existingScores[sheetKey][id]) {
                     const d = existingScores[sheetKey][id];
                     const form = document.getElementById(`form-${suffix}`);
-                    if (suffix === 'ujian') {
-                        fill(form, 'S1A_Markah', d[5]); fill(form, 'S1B_Markah', d[6]); fill(form, 'S2A_Markah', d[7]);
-                        fill(form, 'S2B_Markah', d[8]); fill(form, 'S1C_Markah', d[9]);
-                    } else if (suffix === 'hp3') {
-                        fill(form, 'HP3_Permulaan_10', d[5]); fill(form, 'HP3_Larian_10', d[6]); fill(form, 'HP3_Penamat_5', d[7]);
-                        fill(form, 'HP3_Persediaan_5', d[8]); fill(form, 'HP3_Lungsuran_5', d[9]); fill(form, 'HP3_Lontaran_10', d[10]);
-                        fill(form, 'HP3_Pulihan_5', d[11]);
-                    } else if (suffix === 'hp7') {
-                        fill(form, 'HP7_Penyediaan_Trek_10', d[5]); fill(form, 'HP7_Penyediaan_Sektor_10', d[6]);
-                    }
-                    calculateTotal(suffix);
-                    showToast("Markah sedia ada dimuatkan.", "success");
+                    if (suffix === 'ujian') { fill(form, 'S1A_Markah', d[5]); fill(form, 'S1B_Markah', d[6]); fill(form, 'S2A_Markah', d[7]); fill(form, 'S2B_Markah', d[8]); fill(form, 'S1C_Markah', d[9]); }
+                    else if (suffix === 'hp3') { fill(form, 'HP3_Permulaan_10', d[5]); fill(form, 'HP3_Larian_10', d[6]); fill(form, 'HP3_Penamat_5', d[7]); fill(form, 'HP3_Persediaan_5', d[8]); fill(form, 'HP3_Lungsuran_5', d[9]); fill(form, 'HP3_Lontaran_10', d[10]); fill(form, 'HP3_Pulihan_5', d[11]); }
+                    else if (suffix === 'hp7') { fill(form, 'HP7_Penyediaan_Trek_10', d[5]); fill(form, 'HP7_Penyediaan_Sektor_10', d[6]); }
+                    calculateTotal(suffix); showToast("Markah dimuatkan.", "success");
                 }
             }
         }
-
         function fill(form, name, val) { const inp = form.querySelector(`[name="${name}"]`); if(inp) inp.value = val; }
-
         document.querySelectorAll('.score-in, .score-in-hp3, .score-in-hp7').forEach(i => {
             i.addEventListener('input', function() {
                 let suffix = this.classList.contains('score-in') ? 'ujian' : this.classList.contains('score-in-hp3') ? 'hp3' : 'hp7';
                 calculateTotal(suffix);
             });
         });
-
         function calculateTotal(suffix) {
-            let total = 0;
-            let cls = suffix === 'ujian' ? '.score-in' : suffix === 'hp3' ? '.score-in-hp3' : '.score-in-hp7';
+            let total = 0; let cls = suffix === 'ujian' ? '.score-in' : suffix === 'hp3' ? '.score-in-hp3' : '.score-in-hp7';
             document.querySelectorAll(`#form-${suffix} ${cls}`).forEach(inp => {
-                let v = parseFloat(inp.value) || 0;
-                let max = parseFloat(inp.getAttribute('max'));
-                if(v > max) { inp.value = max; v = max; inp.classList.add('border-red-500', 'bg-red-50'); showToast(`Maksimum ${max}`, 'error'); }
-                else { inp.classList.remove('border-red-500', 'bg-red-50'); }
+                let v = parseFloat(inp.value) || 0; let max = parseFloat(inp.getAttribute('max'));
+                if(v > max) { inp.value = max; v = max; inp.classList.add('border-red-500'); showToast(`Maksimum ${max}`, 'error'); } else { inp.classList.remove('border-red-500'); }
                 total += v;
             });
             document.getElementById(`total-${suffix}`).innerText = total.toFixed(1);
             document.getElementById(`val-total-${suffix}`).value = total.toFixed(1);
         }
-
         function handleFormSubmit(e, sheetName) {
-            e.preventDefault();
-            if (!confirm("Simpan markah?")) return;
-            showLoader(true);
-            const formData = new FormData(e.target);
-            const dataObj = {};
-            formData.forEach((value, key) => dataObj[key] = value);
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'save_mark', sheetName: sheetName, userEmail: currentUser.email, role: currentUser.role, formData: dataObj })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.result === 'success') {
-                    showToast("Disimpan!", 'success');
-                    if(!existingScores[sheetName]) existingScores[sheetName] = {};
-                    // Temporary update local score to reflect change immediately (optional)
-                    // Better to re-fetch if precise data needed, but for UX simply allow re-init
-                    setTimeout(() => initApp(), 1000); 
-                } else {
-                    showToast("Ralat: " + res.message, 'error');
-                    showLoader(false);
-                }
-            })
-            .catch(() => { showToast("Ralat rangkaian", 'error'); showLoader(false); });
+            e.preventDefault(); if (!confirm("Simpan?")) return; showLoader(true);
+            const formData = new FormData(e.target); const dataObj = {}; formData.forEach((value, key) => dataObj[key] = value);
+            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'save_mark', sheetName: sheetName, userEmail: currentUser.email, role: currentUser.role, formData: dataObj }) })
+            .then(res => res.json()).then(res => {
+                if (res.result === 'success') { showToast("Disimpan!", 'success'); if(!existingScores[sheetName]) existingScores[sheetName] = {}; initApp(); } 
+                else { showToast("Ralat: " + res.message, 'error'); showLoader(false); }
+            }).catch(() => { showToast("Ralat rangkaian", 'error'); showLoader(false); });
         }
     </script>
 </body>
