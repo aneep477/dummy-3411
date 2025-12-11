@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pemarkahan MPU3411 Pro</title>
+    <title>Sistem Pemarkahan MPU3411 Pro (Rubrik 5 Peringkat)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -43,6 +43,15 @@
         .rubric-modal { transition: opacity 0.3s ease; }
         .rubric-modal.hidden { opacity: 0; pointer-events: none; }
         .rubric-modal:not(.hidden) { opacity: 1; pointer-events: auto; }
+        
+        /* Rubric Table Specifics */
+        .rubric-table th { background-color: #e2e8f0; color: #1e293b; font-weight: bold; border: 1px solid #cbd5e1; }
+        .rubric-table td { border: 1px solid #e2e8f0; vertical-align: top; padding: 8px; font-size: 0.85rem; }
+        .bg-level-5 { background-color: #d1fae5; } /* Amat Cemerlang - Green */
+        .bg-level-4 { background-color: #dbeafe; } /* Cemerlang - Blue */
+        .bg-level-3 { background-color: #e0f2fe; } /* Kepujian - Light Blue */
+        .bg-level-2 { background-color: #fef9c3; } /* Sederhana - Yellow */
+        .bg-level-1 { background-color: #fee2e2; } /* Lemah - Red */
     </style>
 </head>
 <body class="text-gray-800">
@@ -55,10 +64,10 @@
     <div id="toast-container"></div>
 
     <div id="rubric-modal" class="rubric-modal hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
             
-            <div class="bg-green-700 text-white p-5 flex justify-between items-center shrink-0">
-                <h3 class="text-xl font-bold flex items-center gap-2"><i class="fas fa-book-open"></i> Rubrik Pemarkahan Amali HP3 (Terperinci)</h3>
+            <div class="bg-green-700 text-white p-4 flex justify-between items-center shrink-0">
+                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-book-open"></i> Rubrik Pemarkahan Amali HP3 (5 Peringkat)</h3>
                 <button onclick="toggleRubric(false)" class="hover:bg-green-600 p-2 rounded-full transition"><i class="fas fa-times text-xl"></i></button>
             </div>
 
@@ -71,180 +80,287 @@
                 </button>
             </div>
 
-            <div class="p-6 overflow-y-auto bg-gray-50 flex-1">
+            <div class="p-5 overflow-y-auto bg-gray-50 flex-1">
                 
-                <div id="rubric-content-balapan" class="block">
-                    <div class="mb-2 bg-blue-50 p-3 rounded border border-blue-100 text-sm text-blue-800">
-                        <i class="fas fa-info-circle"></i> Rujukan: Dokumen Rubrik Alih Lari Pecut Final[cite: 1, 2].
-                    </div>
-
-                    <div class="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-lg font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Permulaan (Markah: 10) [cite: 2]</h4>
-                        <table class="w-full text-xs md:text-sm border-collapse">
-                            <thead class="bg-gray-100 text-gray-700">
+                <div id="rubric-content-balapan" class="block space-y-6">
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Permulaan (10%) - Memasang Blok & Teknik Mula</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead>
                                 <tr>
-                                    <th class="border p-2 w-1/4">Tahap & Markah</th>
-                                    <th class="border p-2">Kriteria Penilaian Terperinci</th>
+                                    <th class="w-1/6">Tahap</th>
+                                    <th class="w-1/6">Markah</th>
+                                    [cite_start]<th>Kriteria (Persediaan, Ke Garisan, Sedia) [cite: 9, 12]</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="border p-2 font-bold text-green-700">Amat Cemerlang (9-10)</td>
-                                    <td class="border p-2">
-                                        <ul class="list-disc pl-4 space-y-1">
-                                            <li><strong>Persediaan:</strong> Memasang blok permulaan dengan teknik betul tanpa bantuan[cite: 2].</li>
-                                            <li><strong>Ke Garisan:</strong> Posisi dekam sempurna, tangan seluas bahu, bahu selari garisan[cite: 2].</li>
-                                            <li><strong>Sedia:</strong> Punggung tinggi dari aras kepala, berat badan ke hadapan, kaki bersudut optimum, kepala tunduk relaks[cite: 5].</li>
-                                        </ul>
-                                    </td>
+                                <tr class="bg-level-5">
+                                    <td class="font-bold">Amat Cemerlang</td>
+                                    <td class="text-center font-bold">9.0 - 10</td>
+                                    <td>Memasang blok betul tanpa bantuan. Langkah pantas ke garisan. Posisi dekam & tangan tepat. Punggung tinggi dari kepala, berat ke hadapan, kaki bersudut, kepala tunduk relaks.</td>
                                 </tr>
-                                <tr>
-                                    <td class="border p-2 font-bold text-blue-600">Cemerlang (7.5-8.9)</td>
-                                    <td class="border p-2">Melakukan teknik 'Sedia' dengan betul: Punggung tidak terlalu tinggi, berat badan dibawa ke hadapan, kepala tunduk[cite: 5].</td>
+                                <tr class="bg-level-4">
+                                    <td class="font-bold">Cemerlang</td>
+                                    <td class="text-center font-bold">7.5 - 8.9</td>
+                                    <td>Memasang blok betul. Melangkah ke garisan. Posisi dekam betul. Punggung tidak begitu tinggi, berat ke hadapan, kepala tunduk.</td>
                                 </tr>
-                                <tr>
-                                    <td class="border p-2 font-bold text-yellow-600">Sederhana (5.0-5.9)</td>
-                                    <td class="border p-2">Punggung kurang tinggi, kepala tidak relaks, teknik perlakuan kurang betul dan banyak perlu diperbaiki[cite: 5].</td>
+                                <tr class="bg-level-3">
+                                    <td class="font-bold">Kepujian</td>
+                                    <td class="text-center font-bold">6.0 - 7.4</td>
+                                    <td>Memasang blok hampir betul tanpa kesalahan. Kurang bersedia. Posisi dekam kesalahan minima. Punggung sama aras kepala, berat ke hadapan, kepala tunduk.</td>
                                 </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-lg font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Larian (Markah: 10) [cite: 6]</h4>
-                        <table class="w-full text-xs md:text-sm border-collapse">
-                            <thead class="bg-gray-100 text-gray-700">
-                                <tr>
-                                    <th class="border p-2 w-1/4">Tahap & Markah</th>
-                                    <th class="border p-2">Kriteria Penilaian Terperinci</th>
+                                <tr class="bg-level-2">
+                                    <td class="font-bold">Sederhana</td>
+                                    <td class="text-center font-bold">5.0 - 5.9</td>
+                                    <td>Memasang blok kesalahan kecil/bantuan. Lambat ke garisan. Posisi dekam dengan bantuan. Punggung kurang tinggi, kepala tidak relaks. Teknik kurang betul.</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="border p-2 font-bold text-green-700">Amat Cemerlang (9-10)</td>
-                                    <td class="border p-2">
-                                        <ul class="list-disc pl-4 space-y-1">
-                                            <li><strong>Mula:</strong> Masa tindak balas amat pantas selepas isyarat mula[cite: 6].</li>
-                                            <li><strong>Tolakan:</strong> Tolakan kaki ke blok secara maksimum dan tidak melonjak[cite: 6].</li>
-                                            <li><strong>Koordinasi:</strong> Ayunan tangan optimum dan koordinasi kaki yang selaras[cite: 6].</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="border p-2 font-bold text-blue-600">Cemerlang (7.5-8.9)</td>
-                                    <td class="border p-2">Tolakan kaki maksimum, sedikit melonjak, koordinasi tangan dan kaki betul[cite: 6].</td>
+                                <tr class="bg-level-1">
+                                    <td class="font-bold">Lemah</td>
+                                    <td class="text-center font-bold">&lt; 4.9</td>
+                                    <td>Memasang blok dengan bantuan penuh. Teragak-agak ke garisan. Posisi salah. Punggung tidak tinggi, berat tidak ke hadapan, banyak kelemahan.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-lg font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Penamat (Markah: 5) [cite: 7]</h4>
-                        <table class="w-full text-xs md:text-sm border-collapse">
-                            <thead class="bg-gray-100 text-gray-700">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Larian (10%) - Mula, Tolakan & Koordinasi</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead>
                                 <tr>
-                                    <th class="border p-2 w-1/4">Tahap & Markah</th>
-                                    <th class="border p-2">Kriteria Penilaian Terperinci</th>
+                                    <th class="w-1/6">Tahap</th>
+                                    <th class="w-1/6">Markah</th>
+                                    [cite_start]<th>Kriteria (Mula, Tolakan Kaki, Koordinasi Tangan/Kaki) [cite: 13]</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="border p-2 font-bold text-green-700">Amat Cemerlang (4.5-5.0)</td>
-                                    <td class="border p-2">
-                                        <ul class="list-disc pl-4 space-y-1">
-                                            <li>Melintasi garisan dengan bahagian <strong>Torso</strong> mendahului[cite: 7].</li>
-                                            <li>Membuat <strong>dipping</strong> dengan tangan diayun ke belakang secara tekal[cite: 7].</li>
-                                            <li>Mengekalkan kepantasan dan imbangan serta daya semasa melepasi garisan[cite: 7].</li>
-                                        </ul>
-                                    </td>
+                                <tr class="bg-level-5">
+                                    <td class="font-bold">Amat Cemerlang</td>
+                                    <td class="text-center font-bold">9.0 - 10</td>
+                                    <td>Masa tindak balas amat pantas. Tolakan maksimum tanpa lonjakan. Koordinasi tangan/kaki selaras. Ayunan optimum. Teknik mula betul tanpa bantuan.</td>
                                 </tr>
+                                <tr class="bg-level-4">
+                                    <td class="font-bold">Cemerlang</td>
+                                    <td class="text-center font-bold">7.5 - 8.9</td>
+                                    <td>Masa tindak balas pantas. Tolakan maksimum sedikit melonjak. Koordinasi betul. Ayunan tangan maksimum. Teknik mula betul dengan bantuan minima.</td>
+                                </tr>
+                                <tr class="bg-level-3">
+                                    <td class="font-bold">Kepujian</td>
+                                    <td class="text-center font-bold">6.0 - 7.4</td>
+                                    <td>Masa tindak balas agak pantas. Tolakan agak maksimum tidak melonjak. Koordinasi agak betul. Ayunan agak maksimum. Teknik mula betul.</td>
+                                </tr>
+                                <tr class="bg-level-2">
+                                    <td class="font-bold">Sederhana</td>
+                                    <td class="text-center font-bold">5.0 - 5.9</td>
+                                    <td>Masa tindak balas kurang pantas. Tolakan kurang maksimum. Koordinasi kurang sempurna. Ayunan kurang maksimum. Teknik kurang betul.</td>
+                                </tr>
+                                <tr class="bg-level-1">
+                                    <td class="font-bold">Lemah</td>
+                                    <td class="text-center font-bold">&lt; 4.9</td>
+                                    <td>Masa tindak balas lambat. Tiada tolakan/melonjak. Tiada koordinasi. Ayunan minimum. Banyak kelemahan teknik permulaan.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Penamat (5%) - Teknik Penamat</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead>
                                 <tr>
-                                    <td class="border p-2 font-bold text-yellow-600">Sederhana (2.5-2.9)</td>
-                                    <td class="border p-2">Melintasi dengan torso tetapi membuat dipping <strong>tanpa</strong> hayunan tangan, tidak mengekalkan kepantasan[cite: 7].</td>
+                                    <th class="w-1/6">Tahap</th>
+                                    <th class="w-1/6">Markah</th>
+                                    [cite_start]<th>Kriteria (Torso, Dipping, Kekal Kepantasan) [cite: 14]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-level-5">
+                                    <td class="font-bold">Amat Cemerlang</td>
+                                    <td class="text-center font-bold">4.5 - 5.0</td>
+                                    <td>Melintasi dengan 'Torso'. Membuat dipping dengan tangan diayun ke belakang tekal. Kekalkan kepantasan & imbangan. Teknik betul tanpa bantuan.</td>
+                                </tr>
+                                <tr class="bg-level-4">
+                                    <td class="font-bold">Cemerlang</td>
+                                    <td class="text-center font-bold">3.8 - 4.4</td>
+                                    <td>Melintasi dengan 'Torso'. Membuat dipping tangan ke belakang. Kekalkan kepantasan & imbangan. Teknik betul.</td>
+                                </tr>
+                                <tr class="bg-level-3">
+                                    <td class="font-bold">Kepujian</td>
+                                    <td class="text-center font-bold">3.0 - 3.7</td>
+                                    <td>Melintasi dengan 'Torso'. Membuat dipping tangan dihayun. Agak mengekalkan kepantasan & imbangan. Teknik agak betul.</td>
+                                </tr>
+                                <tr class="bg-level-2">
+                                    <td class="font-bold">Sederhana</td>
+                                    <td class="text-center font-bold">2.5 - 2.9</td>
+                                    <td>Melintasi garisan. Dipping tanpa tangan dihayun. Tidak mengekalkan kepantasan. Teknik kurang betul, banyak perlu diperbaiki.</td>
+                                </tr>
+                                <tr class="bg-level-1">
+                                    <td class="font-bold">Lemah</td>
+                                    <td class="text-center font-bold">0.0 - 2.4</td>
+                                    <td>Berhenti serta merta di garisan. Tidak membuat dipping. Tidak kekal kepantasan. Banyak kelemahan.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div id="rubric-content-padang" class="hidden">
-                    <div class="mb-2 bg-blue-50 p-3 rounded border border-blue-100 text-sm text-blue-800">
-                        <i class="fas fa-info-circle"></i> Rujukan: Dokumen Rubrik Alih Lontar Peluru Final[cite: 9, 10].
-                    </div>
-
-                    <div class="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-lg font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Persediaan & Lungsuran (Markah: 5 + 5) [cite: 10]</h4>
-                        <table class="w-full text-xs md:text-sm border-collapse">
-                            <thead class="bg-gray-100 text-gray-700">
+                <div id="rubric-content-padang" class="hidden space-y-6">
+                    
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">1. Fasa Persediaan (5%) - Pegangan & Sedia</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead>
                                 <tr>
-                                    <th class="border p-2 w-1/4">Komponen</th>
-                                    <th class="border p-2">Kriteria (Amat Cemerlang 4.5 - 5.0)</th>
+                                    <th class="w-1/6">Tahap</th>
+                                    <th class="w-1/6">Markah</th>
+                                    [cite_start]<th>Kriteria (Pegangan, Kedudukan Peluru, Posisi) [cite: 2]</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="border p-2 font-bold">Teknik Pegangan</td>
-                                    <td class="border p-2">Peluru <strong>tidak menyentuh tapak tangan</strong>. Memegang di pangkal tiga atau lima jari[cite: 10].</td>
+                                <tr class="bg-level-5">
+                                    <td class="font-bold">Amat Cemerlang</td>
+                                    <td class="text-center font-bold">4.5 - 5.0</td>
+                                    <td>Peluru tidak sentuh tapak tangan (pangkal 3/5 jari). Sentuh sisi leher/bawah telinga. Berdiri membelakangkan kawasan. Teknik tepat.</td>
                                 </tr>
-                                <tr>
-                                    <td class="border p-2 font-bold">Teknik Sedia</td>
-                                    <td class="border p-2">Peluru menyentuh <strong>sisi leher/bawah telinga</strong>. Berdiri membelakangkan kawasan lontaran[cite: 10].</td>
+                                <tr class="bg-level-4">
+                                    <td class="font-bold">Cemerlang</td>
+                                    <td class="text-center font-bold">3.8 - 4.4</td>
+                                    <td>Kriteria sama seperti Amat Cemerlang tetapi dilakukan dengan baik (sedikit perbezaan kualiti).</td>
                                 </tr>
-                                <tr>
-                                    <td class="border p-2 font-bold">Lungsuran</td>
-                                    <td class="border p-2">Melungsurkan kedua kaki ke belakang supaya kaki serentak. Kaki kekal dalam bulatan. Pergerakan <strong>pantas dan licin</strong>[cite: 10].</td>
+                                <tr class="bg-level-3">
+                                    <td class="font-bold">Kepujian</td>
+                                    <td class="text-center font-bold">3.0 - 3.7</td>
+                                    <td>Peluru tidak sentuh tapak tangan. Kedudukan peluru <strong>tidak</strong> menyentuh sisi leher dengan tepat. Teknik betul perlu dibaiki.</td>
                                 </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-lg font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Lontaran (Markah: 10) [cite: 13]</h4>
-                        <table class="w-full text-xs md:text-sm border-collapse">
-                            <thead class="bg-gray-100 text-gray-700">
-                                <tr>
-                                    <th class="border p-2 w-1/4">Tahap & Markah</th>
-                                    <th class="border p-2">Kriteria Penilaian Terperinci</th>
+                                <tr class="bg-level-2">
+                                    <td class="font-bold">Sederhana</td>
+                                    <td class="text-center font-bold">2.5 - 2.9</td>
+                                    <td>Peluru tidak sentuh tapak tangan. <strong>Tidak</strong> memegang di pangkal jari. Kedudukan peluru salah. <strong>Tidak</strong> membelakangkan kawasan. Teknik salah.</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="border p-2 font-bold text-green-700">Amat Cemerlang (9.0-10)</td>
-                                    <td class="border p-2">
-                                        <ul class="list-disc pl-4 space-y-1">
-                                            <li><strong>Kilasan:</strong> Pinggul kanan dipusing ke kiri & atas serentak dengan kilasan badan[cite: 13].</li>
-                                            <li><strong>Tolakan:</strong> Menolak sambil meluruskan lutut hingga badan terangkat & melentik[cite: 13].</li>
-                                            <li><strong>Pelepasan:</strong> Pergerakan bermula dari bahu, berlaku pemindahan berat badan & ikut lajak[cite: 13].</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="border p-2 font-bold text-blue-600">Cemerlang (7.5-8.9)</td>
-                                    <td class="border p-2">Teknik sama tetapi kurang sedikit dari segi menolak/meluruskan lutut atau pemindahan berat badan[cite: 13].</td>
+                                <tr class="bg-level-1">
+                                    <td class="font-bold">Lemah</td>
+                                    <td class="text-center font-bold">0.0 - 2.4</td>
+                                    <td>Teknik pegangan dan persediaan salah sepenuhnya.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <h4 class="text-lg font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Pulihan (Markah: 5) [cite: 13]</h4>
-                        <table class="w-full text-xs md:text-sm border-collapse">
-                            <thead class="bg-gray-100 text-gray-700">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">2. Fasa Lungsuran (5%)</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead>
                                 <tr>
-                                    <th class="border p-2 w-1/4">Tahap & Markah</th>
-                                    <th class="border p-2">Kriteria Penilaian Terperinci</th>
+                                    <th class="w-1/6">Tahap</th>
+                                    <th class="w-1/6">Markah</th>
+                                    [cite_start]<th>Kriteria (Pergerakan Kaki, Keseimbangan) [cite: 2]</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr class="bg-level-5">
+                                    <td class="font-bold">Amat Cemerlang</td>
+                                    <td class="text-center font-bold">4.5 - 5.0</td>
+                                    <td>Lungsur kedua kaki serentak. Kedua kaki dalam bulatan. Lungsuran pantas dan licin. Teknik betul dan tepat.</td>
+                                </tr>
+                                <tr class="bg-level-4">
+                                    <td class="font-bold">Cemerlang</td>
+                                    <td class="text-center font-bold">3.8 - 4.4</td>
+                                    <td>Lungsur serentak. Kaki dalam bulatan. Lungsuran <strong>kurang</strong> pantas dan licin. Teknik betul dan tepat.</td>
+                                </tr>
+                                <tr class="bg-level-3">
+                                    <td class="font-bold">Kepujian</td>
+                                    <td class="text-center font-bold">3.0 - 3.7</td>
+                                    <td>Lungsur serentak. Kaki dalam bulatan. Kurang pantas. Teknik betul perlu dibaiki.</td>
+                                </tr>
+                                <tr class="bg-level-2">
+                                    <td class="font-bold">Sederhana</td>
+                                    <td class="text-center font-bold">2.5 - 2.9</td>
+                                    <td><strong>Tidak</strong> melungsurkan kaki serentak. Kaki tidak dalam bulatan. Tidak pantas. Teknik salah.</td>
+                                </tr>
+                                <tr class="bg-level-1">
+                                    <td class="font-bold">Lemah</td>
+                                    <td class="text-center font-bold">0.0 - 2.4</td>
+                                    <td>Teknik lungsuran salah sepenuhnya.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">3. Fasa Lontaran (10%) - Kilasan & Teknik Lontar</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead>
                                 <tr>
-                                    <td class="border p-2 font-bold text-green-700">Amat Cemerlang (4.5-5.0)</td>
-                                    <td class="border p-2">
-                                        <ul class="list-disc pl-4 space-y-1">
-                                            <li>Berjaya mengimbangi badan di kawasan hadapan (tidak batal)[cite: 13].</li>
-                                            <li>Melakukan pergerakan <strong>ikut lajak</strong>[cite: 13].</li>
-                                            <li>Kaki kanan dibawa ke hadapan dan dibengkokkan sedikit pada masa yang betul[cite: 13].</li>
-                                        </ul>
-                                    </td>
+                                    <th class="w-1/6">Tahap</th>
+                                    <th class="w-1/6">Markah</th>
+                                    [cite_start]<th>Kriteria (Kilasan Pinggul, Tolakan, Pelepasan) [cite: 5]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-level-5">
+                                    <td class="font-bold">Amat Cemerlang</td>
+                                    <td class="text-center font-bold">9.0 - 10</td>
+                                    <td>Pinggul kanan pusing kiri/atas serentak kilasan badan. Tolak lurus lutut, badan lentik. Mula dari bahu, pindah berat, ikut lajak.</td>
+                                </tr>
+                                <tr class="bg-level-4">
+                                    <td class="font-bold">Cemerlang</td>
+                                    <td class="text-center font-bold">7.5 - 8.9</td>
+                                    <td>Pinggul pusing serentak. Tolak lurus lutut. Mula bahu, pindah berat, ikut lajak. Teknik betul.</td>
+                                </tr>
+                                <tr class="bg-level-3">
+                                    <td class="font-bold">Kepujian</td>
+                                    <td class="text-center font-bold">6.0 - 7.4</td>
+                                    <td>Pinggul <strong>kurang</strong> dipusingkan. Kurang menolak lutut. Kurang pindah berat. Kurang ikut lajak. Teknik betul perlu dibaiki.</td>
+                                </tr>
+                                <tr class="bg-level-2">
+                                    <td class="font-bold">Sederhana</td>
+                                    <td class="text-center font-bold">5.0 - 5.9</td>
+                                    <td>Pinggul kurang dipusingkan. Kurang menolak lutut. Kurang pindah berat. Teknik betul perlu dibaiki.</td>
+                                </tr>
+                                <tr class="bg-level-1">
+                                    <td class="font-bold">Lemah</td>
+                                    <td class="text-center font-bold">&lt; 4.9</td>
+                                    <td>Pinggul <strong>tidak</strong> dipusingkan. Tidak menolak lutut. Tiada pemindahan berat. Teknik salah.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h4 class="text-base font-bold text-green-800 border-b pb-2 mb-3">4. Fasa Pulihan (5%)</h4>
+                        <table class="w-full rubric-table border-collapse">
+                            <thead>
+                                <tr>
+                                    <th class="w-1/6">Tahap</th>
+                                    <th class="w-1/6">Markah</th>
+                                    [cite_start]<th>Kriteria (Imbangan, Ikut Lajak, Kaki Kanan) [cite: 5]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-level-5">
+                                    <td class="font-bold">Amat Cemerlang</td>
+                                    <td class="text-center font-bold">4.5 - 5.0</td>
+                                    <td>Imbang badan (tidak batal). Pergerakan ikut lajak. Kaki kanan ke hadapan & bengkok pada masa yang betul/tepat.</td>
+                                </tr>
+                                <tr class="bg-level-4">
+                                    <td class="font-bold">Cemerlang</td>
+                                    <td class="text-center font-bold">3.8 - 4.4</td>
+                                    <td>Imbang badan. Ikut lajak. Kaki kanan ke hadapan & bengkok pada masa yang betul. Teknik baik.</td>
+                                </tr>
+                                <tr class="bg-level-3">
+                                    <td class="font-bold">Kepujian</td>
+                                    <td class="text-center font-bold">3.0 - 3.7</td>
+                                    <td>Kurang imbang. Kurang ikut lajak. Kaki kanan dibawa ke hadapan pada masa yang sama. Teknik perlu dibaiki.</td>
+                                </tr>
+                                <tr class="bg-level-2">
+                                    <td class="font-bold">Sederhana</td>
+                                    <td class="text-center font-bold">2.5 - 2.9</td>
+                                    <td>Kurang imbang. Kurang ikut lajak. Kaki kanan dibawa ke hadapan pada masa <strong>tidak</strong> sama. Teknik perlu dibaiki.</td>
+                                </tr>
+                                <tr class="bg-level-1">
+                                    <td class="font-bold">Lemah</td>
+                                    <td class="text-center font-bold">0.0 - 2.4</td>
+                                    <td>Tidak berjaya imbang. Tiada ikut lajak. Teknik salah.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -285,7 +401,7 @@
                 </div>
                 <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg transition transform hover:scale-[1.02]">LOG MASUK</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Versi 2.0 | Dikemaskini 2025</p>
+            <p class="text-xs text-center text-gray-400 mt-6">Versi 2.1 | Dikemaskini 2025</p>
         </div>
     </div>
 
@@ -531,18 +647,25 @@
             const btnBalapan = document.getElementById('tab-btn-balapan');
             const btnPadang = document.getElementById('tab-btn-padang');
             
-            btnBalapan.className = "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition border-b-2 border-transparent";
+            btnBalapan.className = "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white hover:bg-gray-50 transition";
             btnPadang.className = "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition border-b-2 border-transparent";
+            
+            // Inactive state style
+            if(tabName === 'balapan') {
+               btnPadang.className = "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition border-b-2 border-transparent";
+               btnBalapan.className = "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition";
+            } else {
+               btnBalapan.className = "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition border-b-2 border-transparent";
+               btnPadang.className = "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition";
+            }
 
-            // Show Selected Content & Style Button
+            // Show Selected Content
             if (tabName === 'balapan') {
                 document.getElementById('rubric-content-balapan').classList.remove('hidden');
                 document.getElementById('rubric-content-balapan').classList.add('block');
-                btnBalapan.className = "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition";
             } else {
                 document.getElementById('rubric-content-padang').classList.remove('hidden');
                 document.getElementById('rubric-content-padang').classList.add('block');
-                btnPadang.className = "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition";
             }
         }
         
