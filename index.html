@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem MPU3411 Pro (V8 Final)</title>
+    <title>Sistem MPU3411 Pro (V8 Final - Fixed)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -616,7 +616,7 @@
                 <div><label class="block text-sm font-bold text-slate-700 mb-1">Kata Laluan</label><input type="password" id="password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required></div>
                 <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg">LOG MASUK</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Versi 8.0 | Final</p>
+            <p class="text-xs text-center text-gray-400 mt-6">Versi 7.3 |HA@NIFFFAIZAL IPGKDA 2026</p>
         </div>
     </div>
 
@@ -675,7 +675,7 @@
                     <form id="form-ujian" onsubmit="handleFormSubmit(event, 'MARKAH_UJIAN')">
                         <div class="bg-blue-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-ujian" onchange="filterStudents('ujian')" class="w-full p-2 border rounded bg-white"></select></div>
-                            <div><label class="block text-xs font-bold mb-1">Pelajar</label><select id="sel-student-ujian" onchange="loadStudentData('ujian')" class="w-full p-2 border rounded bg-white" disabled></select></div>
+                            <div><label class="block text-xs font-bold mb-1">Pelajar</label><input type="text" id="search-student-ujian" onkeyup="searchDropdown('ujian')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-ujian" onchange="loadStudentData('ujian')" class="w-full p-2 border rounded bg-white" disabled></select></div>
                             <div class="md:col-span-2"><input type="text" id="name-ujian" class="w-full p-2 bg-gray-200 border rounded font-bold text-center" readonly placeholder="Nama Pelajar">
                             <input type="hidden" name="ID_SISTEM" id="id-ujian"><input type="hidden" name="Nama_Pelajar" id="hidden-name-ujian"><input type="hidden" name="Kelas" id="class-ujian"></div>
                         </div>
@@ -715,7 +715,7 @@
                     <form id="form-hp3" onsubmit="handleFormSubmit(event, 'MARKAH_AMALI_HP3')">
                         <div class="bg-green-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-hp3" onchange="filterStudents('hp3')" class="w-full p-2 border rounded bg-white"></select></div>
-                            <div><label class="block text-xs font-bold mb-1">Pelajar</label><select id="sel-student-hp3" onchange="loadStudentData('hp3')" class="w-full p-2 border rounded bg-white" disabled></select></div>
+                            <div><label class="block text-xs font-bold mb-1">Pelajar</label><input type="text" id="search-student-hp3" onkeyup="searchDropdown('hp3')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-hp3" onchange="loadStudentData('hp3')" class="w-full p-2 border rounded bg-white" disabled></select></div>
                             <div class="md:col-span-2"><input type="text" id="name-hp3" class="w-full p-2 bg-gray-100 border rounded font-bold text-center" readonly placeholder="Nama Pelajar"><input type="hidden" name="ID_SISTEM" id="id-hp3"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp3"><input type="hidden" name="Kelas" id="class-hp3"></div>
                         </div>
                         <div class="mb-6 border p-4 rounded bg-white">
@@ -750,7 +750,7 @@
                     <form id="form-hp7" onsubmit="handleFormSubmit(event, 'MARKAH_HP7')">
                         <div class="bg-yellow-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-hp7" onchange="filterStudents('hp7')" class="w-full p-2 border rounded bg-white"></select></div>
-                            <div><label class="block text-xs font-bold mb-1">Pelajar</label><select id="sel-student-hp7" onchange="loadStudentData('hp7')" class="w-full p-2 border rounded bg-white" disabled></select></div>
+                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-hp7" onkeyup="searchDropdown('hp7')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-hp7" onchange="loadStudentData('hp7')" class="w-full p-2 border rounded bg-white" disabled></select></div>
                             <div class="md:col-span-2"><input type="text" id="name-hp7" class="w-full p-2 bg-gray-100 border rounded font-bold text-center" readonly placeholder="Nama Pelajar"><input type="hidden" name="ID_SISTEM" id="id-hp7"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp7"><input type="hidden" name="Kelas" id="class-hp7"></div>
                         </div>
                         <div class="grid grid-cols-2 gap-4 mb-4">
@@ -870,7 +870,11 @@
             const cls = document.getElementById(`sel-class-${suffix}`).value;
             const studentSel = document.getElementById(`sel-student-${suffix}`);
             studentSel.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
-            document.getElementById(`search-student-${suffix}`).value = '';
+            
+            // Check if search input exists before accessing it (to fix TypeError in Ujian section)
+            const searchInput = document.getElementById(`search-student-${suffix}`);
+            if (searchInput) searchInput.value = '';
+
             if(!cls) { studentSel.disabled = true; filteredStudentsCache = []; return; }
             studentSel.disabled = false;
             filteredStudentsCache = allStudents.filter(s => s.Kelas === cls);
@@ -998,8 +1002,12 @@
                 const sHP3 = existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][id];
                 const sHP7 = existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][id];
 
+                // Logic Pengiraan Total untuk Dashboard (Pastikan index betul dengan sheet baru)
+                // Ujian: Col F(5), G(6), H(7) = Bahagian A, B, C
                 const valUjian = sUjian ? (cleanNumber(sUjian[5]) + cleanNumber(sUjian[6]) + cleanNumber(sUjian[7])).toFixed(1) : '-';
+                // HP3: Col 5-11 (7 items)
                 const valHP3 = sHP3 ? [5,6,7,8,9,10,11].reduce((acc, idx) => acc + cleanNumber(sHP3[idx]), 0).toFixed(1) : '-';
+                // HP7: Col 5-6 (2 items)
                 const valHP7 = sHP7 ? (cleanNumber(sHP7[5]) + cleanNumber(sHP7[6])).toFixed(1) : '-';
                 
                 let totalScore = 0;
