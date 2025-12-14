@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem MPU3411 Pro (Full Rubric)</title>
+    <title>Sistem MPU3411 Pro (V8 Final)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -48,13 +48,14 @@
 
         /* Butang Rubrik Oren */
         .btn-rubric-orange {
-            background-color: #f97316; color: white; font-weight: 800; font-size: 0.85rem;
-            padding: 8px 16px; border-radius: 6px; border: 1px solid #c2410c;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer;
-            display: inline-flex; align-items: center; gap: 6px;
+            background-color: #f97316; color: white; font-weight: 800; font-size: 0.9rem;
+            padding: 10px 20px; border-radius: 8px; border: 2px solid #c2410c;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
             transition: transform 0.1s, background-color 0.2s;
         }
         .btn-rubric-orange:hover { background-color: #ea580c; }
+        .btn-rubric-orange:active { transform: translateY(2px); }
     </style>
 </head>
 <body class="text-gray-800">
@@ -98,8 +99,8 @@
                                     <td>
                                         • Dapat memasang blok permulaan dengan teknik yang betul tanpa bantuan.<br>
                                         • Peserta melangkah pantas ke garisan setelah isyarat diberikan.<br>
-                                        • Posisi "Ke Garisan": Tangan dibuka seluas bahu di belakang garisan.<br>
-                                        • Posisi "Sedia": Pinggul tinggi sedikit dari bahu, bahu selari garisan.<br>
+                                        • Posisi "Ke Garisan": Tangan dibuka seluas bahu di belakang garisan, bahu selari dengan garisan.<br>
+                                        • Posisi "Sedia": Pinggul tinggi sedikit dari bahu dengan sudut kaki yang optimum.<br>
                                         • Reaksi berlepas yang sangat pantas dan tolakan kaki yang kuat pada blok.
                                     </td>
                                 </tr>
@@ -223,16 +224,14 @@
                                     <td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td>
                                     <td>
                                         • Mengekalkan momentum.<br>
-                                        • Melakukan teknik 'dipping' dada dengan baik.<br>
-                                        • Mengekalkan kepantasan dan imbangan badan.
+                                        • Melakukan teknik 'dipping' dada dengan baik.
                                     </td>
                                 </tr>
                                 <tr class="bg-level-3">
                                     <td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td>
                                     <td>
                                         • Momentum agak berkurang.<br>
-                                        • Melintasi garisan tanpa teknik 'dipping' yang jelas.<br>
-                                        • Agak mengekalkan kepantasan dan imbangan badan.
+                                        • Melintasi garisan tanpa teknik 'dipping' yang jelas.
                                     </td>
                                 </tr>
                                 <tr class="bg-level-2">
@@ -327,8 +326,9 @@
                                 <tr class="bg-level-5">
                                     <td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td>
                                     <td>
-                                        • Melungsur (Glide) kedua-dua kaki dengan pantas dan licin.<br>
-                                        • Kaki kanan mendarat di pusat bulatan. Kaki kiri mendarat di papan penahan.<br>
+                                        • Melungsur (Glide) kedua-dua kaki dengan pantas dan rendah.<br>
+                                        • Kaki kanan mendarat di pusat bulatan dengan seimbang.<br>
+                                        • Kaki kiri mendarat di papan penahan serentak.<br>
                                         • Keseimbangan badan dan peluru di leher terjaga.
                                     </td>
                                 </tr>
@@ -385,7 +385,7 @@
                                         • Memusingkan pinggang ke kiri dan ke atas serentak dengan kilasan badan.<br>
                                         • Menolak dengan meluruskan lutut dan pinggang.<br>
                                         • Ekstensi tangan penuh (sudut 45 darjah).<br>
-                                        • Pemindahan berat badan yang lancar.
+                                        • Teknik "Putting" (Menolak) bukan membaling.
                                     </td>
                                 </tr>
                                 <tr class="bg-level-4">
@@ -616,7 +616,7 @@
                 <div><label class="block text-sm font-bold text-slate-700 mb-1">Kata Laluan</label><input type="password" id="password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required></div>
                 <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg">LOG MASUK</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Versi 7.2 | HANIFFFAIZAL IPGKDA 2026</p>
+            <p class="text-xs text-center text-gray-400 mt-6">Versi 8.0 | Final</p>
         </div>
     </div>
 
@@ -626,7 +626,7 @@
             <div class="px-6 flex justify-between items-center h-full max-w-7xl mx-auto w-full">
                 <div class="flex items-center gap-3">
                     <div class="bg-yellow-700 text-slate-900 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl">M</div>
-                    <div><h1 class="text-xl font-bold">MPU3411 OLAHRAGA</h1><p class="text-xs text-slate-400">Pengguna: <span id="user-display-name">...</span></p></div>
+                    <div><h1 class="text-xl font-bold">MPU3411 OLAHRAGA</h1><p class="text-xs text-slate-400">Pengguna: <span id="user-display-name">...</span> | <span id="user-role-display">...</span></p></div>
                 </div>
                 <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2"><i class="fas fa-sign-out-alt"></i>KELUAR</button>
             </div>
@@ -754,8 +754,8 @@
                             <div class="md:col-span-2"><input type="text" id="name-hp7" class="w-full p-2 bg-gray-100 border rounded font-bold text-center" readonly placeholder="Nama Pelajar"><input type="hidden" name="ID_SISTEM" id="id-hp7"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp7"><input type="hidden" name="Kelas" id="class-hp7"></div>
                         </div>
                         <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="p-4 border rounded text-center"><label class="font-bold block mb-2">Penyediaan Trek (10)</label><input type="number" name="HP7_Penyediaan_Trek_10" class="score-in-hp7 w-full border p-2 text-center text-lg font-bold" max="10"></div>
-                            <div class="p-4 border rounded text-center"><label class="font-bold block mb-2">Penyediaan Sektor (10)</label><input type="number" name="HP7_Penyediaan_Sektor_10" class="score-in-hp7 w-full border p-2 text-center text-lg font-bold" max="10"></div>
+                            <div class="p-4 border rounded text-center"><label class="font-bold block mb-2">Penyediaan Trek (10)</label><input type="number" name="HP7_Penyediaan_Trek_10" class="score-in-hp7 w-full border p-3 rounded text-center font-bold text-lg" max="10"></div>
+                            <div class="p-4 border rounded text-center"><label class="font-bold block mb-2">Penyediaan Sektor (10)</label><input type="number" name="HP7_Penyediaan_Sektor_10" class="score-in-hp7 w-full border p-3 rounded text-center font-bold text-lg" max="10"></div>
                         </div>
                         <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-hp7" class="text-yellow-600 text-xl">0</span> / 20</div><input type="hidden" name="Jumlah_HP7" id="val-total-hp7"><button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
                     </form>
@@ -777,7 +777,23 @@
         let existingScores = {};
         let filteredStudentsCache = [];
 
-        // --- RUBRIC TOGGLE ---
+        // --- DATA NORMALIZER ---
+        function normalizeData(students) {
+            return students.map(s => {
+                const kelas = s.Kelas || s.KELAS || s.kelas || "TIADA KELAS";
+                const nama = s.Nama_Pelajar || s.NAMA_PELAJAR || s.Nama || "TIADA NAMA";
+                const id = s.ID_SISTEM || s.ID || s.id_sistem || "";
+                return { ...s, Kelas: kelas.toString().trim(), Nama_Pelajar: nama, ID_SISTEM: id };
+            });
+        }
+
+        function cleanNumber(val) {
+            if (val === "#N/A" || val === "" || val === null || val === undefined) return 0;
+            const num = parseFloat(val);
+            return isNaN(num) ? 0 : num;
+        }
+
+        // --- RUBRIC LOGIC ---
         function toggleRubric(show) { document.getElementById('rubric-modal').classList.toggle('hidden', !show); }
         function toggleRubricHP7(show) { document.getElementById('rubric-hp7-modal').classList.toggle('hidden', !show); }
         
@@ -788,26 +804,7 @@
             document.getElementById('tab-btn-padang').className = tabName === 'padang' ? "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition" : "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 transition";
         }
 
-        // --- HELPER FUNCTIONS ---
-        function normalizeData(students) {
-            return students.map(s => {
-                const kelas = s.Kelas || s.KELAS || s.kelas || "TIADA KELAS";
-                const nama = s.Nama_Pelajar || s.NAMA_PELAJAR || s.Nama || "TIADA NAMA";
-                const id = s.ID_SISTEM || s.ID || s.id_sistem || "";
-                return { ...s, Kelas: kelas.toString().trim(), Nama_Pelajar: nama, ID_SISTEM: id };
-            });
-        }
-        function cleanNumber(val) {
-            if (val === "#N/A" || val === "" || val === null || val === undefined) return 0;
-            const num = parseFloat(val);
-            return isNaN(num) ? 0 : num;
-        }
-        function showToast(msg, type='success') {
-            const t = document.createElement('div'); t.className = `toast ${type}`;
-            t.innerHTML = `<span>${msg}</span>`; document.getElementById('toast-container').appendChild(t);
-            requestAnimationFrame(() => t.classList.add('show')); setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300) }, 3000);
-        }
-        function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
+        // --- NAV & UI ---
         function nav(id) {
             document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
             document.getElementById(id).style.display = 'block';
@@ -815,15 +812,21 @@
             document.getElementById(`btn-${id}`).classList.add('bg-blue-100', 'text-blue-700', 'active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        function showToast(msg, type='success') {
+            const t = document.createElement('div'); t.className = `toast ${type}`;
+            t.innerHTML = `<span>${msg}</span>`; document.getElementById('toast-container').appendChild(t);
+            requestAnimationFrame(() => t.classList.add('show')); setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300) }, 3000);
+        }
+        function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
 
         // --- LOGIN ---
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault(); showLoader(true);
             fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email: document.getElementById('email').value.trim(), password: document.getElementById('password').value.trim() }) })
             .then(res => res.json()).then(data => {
-                if (data.result === 'success') { 
-                    currentUser = { ...data.user, kelas: (data.user.kelas || "ALL").toString().trim() }; 
-                    initApp(); 
+                if (data.result === 'success') { 
+                    currentUser = { ...data.user, kelas: (data.user.kelas || "ALL").toString().trim() }; 
+                    initApp(); 
                 } else { showToast(data.message, 'error'); showLoader(false); }
             }).catch(() => { showToast("Ralat sambungan", 'error'); showLoader(false); });
         });
@@ -841,9 +844,9 @@
             fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'get_data', email: currentUser.email, role: currentUser.role }) })
             .then(res => res.json()).then(data => {
                 if(data.result === 'success'){
-                    allStudents = normalizeData(data.data.students); 
+                    allStudents = normalizeData(data.data.students); 
                     existingScores = data.data.scores;
-                    updateDashboard(); 
+                    updateDashboard(); 
                     initDropdowns('ujian'); initDropdowns('hp3'); initDropdowns('hp7');
                 } else { showToast(data.message, 'error'); }
                 showLoader(false);
@@ -995,12 +998,8 @@
                 const sHP3 = existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][id];
                 const sHP7 = existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][id];
 
-                // Logic Pengiraan Total untuk Dashboard (Pastikan index betul dengan sheet baru)
-                // Ujian: Col F(5), G(6), H(7) = Bahagian A, B, C
                 const valUjian = sUjian ? (cleanNumber(sUjian[5]) + cleanNumber(sUjian[6]) + cleanNumber(sUjian[7])).toFixed(1) : '-';
-                // HP3: Col 5-11 (7 items)
                 const valHP3 = sHP3 ? [5,6,7,8,9,10,11].reduce((acc, idx) => acc + cleanNumber(sHP3[idx]), 0).toFixed(1) : '-';
-                // HP7: Col 5-6 (2 items)
                 const valHP7 = sHP7 ? (cleanNumber(sHP7[5]) + cleanNumber(sHP7[6])).toFixed(1) : '-';
                 
                 let totalScore = 0;
