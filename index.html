@@ -3,71 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem MPU3411 Pro (V8 Final - Fixed)</title>
+    <title>Sistem MPU3411 Pro (V8 Final - Analytics)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .fixed-header { z-index: 50; top: 0; left: 0; right: 0; height: 70px; }
         .main-content-area { padding-top: 130px; padding-bottom: 40px; min-height: 100vh; }
         .content-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Loading Overlay */
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.95); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
-        
-        /* Toast Notification */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 10px; }
         .toast { min-width: 300px; padding: 16px; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.3s ease-out; display: flex; align-items: center; }
         .toast.show { transform: translateX(0); }
         .toast.success { background-color: #10b981; }
         .toast.error { background-color: #ef4444; }
-
-        /* Login Background */
         .login-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); position: relative; overflow: hidden; }
-
-        /* Table Styles */
         .styled-table thead tr { background-color: #1e293b; color: #ffffff; text-align: left; }
         .styled-table th, .styled-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
         .styled-table tbody tr:nth-of-type(even) { background-color: #f8fafc; }
-
-        /* Rubric Modal */
         .rubric-modal { transition: opacity 0.3s ease; }
         .rubric-modal.hidden { opacity: 0; pointer-events: none; }
         .rubric-modal:not(.hidden) { opacity: 1; pointer-events: auto; }
         .rubric-table th { background-color: #e2e8f0; border: 1px solid #cbd5e1; padding: 10px; font-size: 0.8rem; }
         .rubric-table td { border: 1px solid #e2e8f0; vertical-align: top; padding: 10px; font-size: 0.75rem; line-height: 1.5; }
-        
-        /* Rubric Colors */
         .bg-level-5 { background-color: #d1fae5; } 
         .bg-level-4 { background-color: #dbeafe; } 
         .bg-level-3 { background-color: #e0f2fe; } 
         .bg-level-2 { background-color: #fef9c3; } 
         .bg-level-1 { background-color: #fee2e2; } 
-
-        /* Butang Rubrik Oren */
-        .btn-rubric-orange {
-            background-color: #f97316; color: white; font-weight: 800; font-size: 0.9rem;
-            padding: 10px 20px; border-radius: 8px; border: 2px solid #c2410c;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer;
-            display: inline-flex; align-items: center; gap: 8px;
-            transition: transform 0.1s, background-color 0.2s;
-        }
+        .btn-rubric-orange { background-color: #f97316; color: white; font-weight: 800; font-size: 0.9rem; padding: 10px 20px; border-radius: 8px; border: 2px solid #c2410c; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: transform 0.1s, background-color 0.2s; }
         .btn-rubric-orange:hover { background-color: #ea580c; }
         .btn-rubric-orange:active { transform: translateY(2px); }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <!-- LOADER -->
     <div id="loader" class="loading-overlay">
         <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-4"></div>
         <p id="loader-text" class="text-gray-700 font-bold animate-pulse">Sedang memproses...</p>
     </div>
     <div id="toast-container"></div>
 
-    <!-- MODAL RUBRIK AMALI (HP3) - VERSI PENUH/DETAIL -->
     <div id="rubric-modal" class="rubric-modal hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[95vh] flex flex-col overflow-hidden">
             <div class="bg-green-700 text-white p-4 flex justify-between items-center shrink-0">
@@ -75,552 +54,46 @@
                 <button onclick="toggleRubric(false)" class="hover:bg-green-600 p-2 rounded-full transition"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="flex border-b bg-gray-50 shrink-0">
-                <button onclick="switchRubricTab('balapan')" id="tab-btn-balapan" class="flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white hover:bg-gray-50 transition">ACARA BALAPAN (LARI PECUT)</button>
-                <button onclick="switchRubricTab('padang')" id="tab-btn-padang" class="flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 hover:bg-gray-50 transition">ACARA PADANG (LONTAR PELURU)</button>
+                <button onclick="switchRubricTab('balapan')" id="tab-btn-balapan" class="flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white">ACARA BALAPAN</button>
+                <button onclick="switchRubricTab('padang')" id="tab-btn-padang" class="flex-1 py-3 px-4 text-sm font-bold text-gray-500">ACARA PADANG</button>
             </div>
             <div class="p-5 overflow-y-auto bg-gray-50 flex-1">
-                
-                <!-- Kandungan Balapan -->
                 <div id="rubric-content-balapan" class="block space-y-6">
-                    <!-- Fasa Permulaan -->
-                    <div class="bg-white p-4 rounded shadow-sm border">
-                        <h4 class="font-bold text-green-800 border-b pb-2 mb-2">1. Fasa Permulaan (10%)</h4>
-                        <table class="w-full rubric-table">
-                            <thead>
-                                <tr>
-                                    <th width="15%">Tahap</th>
-                                    <th width="10%">Markah</th>
-                                    <th>Kriteria (Persediaan, Ke Garisan, Sedia)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td>
-                                    <td>
-                                        • Dapat memasang blok permulaan dengan teknik yang betul tanpa bantuan.<br>
-                                        • Peserta melangkah pantas ke garisan setelah isyarat diberikan.<br>
-                                        • Posisi "Ke Garisan": Tangan dibuka seluas bahu di belakang garisan, bahu selari dengan garisan.<br>
-                                        • Posisi "Sedia": Pinggul tinggi sedikit dari bahu dengan sudut kaki yang optimum.<br>
-                                        • Reaksi berlepas yang sangat pantas dan tolakan kaki yang kuat pada blok.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td>
-                                    <td>
-                                        • Dapat memasang blok permulaan dengan teknik yang betul.<br>
-                                        • Melangkah ke garisan setelah isyarat diberikan.<br>
-                                        • Posisi "Sedia": Pinggul tidak begitu tinggi dari bahu.<br>
-                                        • Reaksi berlepas yang baik dan memuaskan.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td>
-                                    <td>
-                                        • Memasang blok permulaan dengan teknik hampir betul/kesalahan kecil.<br>
-                                        • Kurang bersedia melangkah ke garisan.<br>
-                                        • Posisi "Sedia": Pinggul sama aras dengan kepala.<br>
-                                        • Reaksi berlepas sederhana.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td>
-                                    <td>
-                                        • Memerlukan bantuan untuk memasang blok.<br>
-                                        • Lambat melangkah ke garisan.<br>
-                                        • Posisi "Sedia": Pinggul kurang tinggi dari bahu.<br>
-                                        • Reaksi berlepas lambat.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td>
-                                    <td>
-                                        • Memasang blok dengan bantuan sepenuhnya.<br>
-                                        • Teragak-agak melangkah ke garisan.<br>
-                                        • Posisi salah sepenuhnya (Pinggul tidak tinggi).<br>
-                                        • Tiada reaksi yang betul semasa berlepas.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Fasa Larian -->
-                    <div class="bg-white p-4 rounded shadow-sm border">
-                        <h4 class="font-bold text-green-800 border-b pb-2 mb-2">2. Fasa Larian (10%)</h4>
-                        <table class="w-full rubric-table">
-                            <thead>
-                                <tr>
-                                    <th width="15%">Tahap</th>
-                                    <th width="10%">Markah</th>
-                                    <th>Kriteria (Ayunan, Langkah, Postur)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td>
-                                    <td>
-                                        • Ayunan tangan bersudut 90 darjah dan kuat.<br>
-                                        • Lutut diangkat tinggi (High Knee).<br>
-                                        • Larian di atas bebola kaki (hujung kaki) sepenuhnya.<br>
-                                        • Postur badan condong ke depan sedikit dengan stabil.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td>
-                                    <td>
-                                        • Ayunan tangan baik dan lutut diangkat tinggi.<br>
-                                        • Sebahagian besar larian menggunakan bebola kaki.<br>
-                                        • Postur badan memuaskan.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td>
-                                    <td>
-                                        • Ayunan tangan kurang dari 90 darjah.<br>
-                                        • Lutut kurang tinggi.<br>
-                                        • Larian kadang-kala menggunakan tapak kaki rata.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td>
-                                    <td>
-                                        • Ayunan tangan lemah.<br>
-                                        • Larian menggunakan tapak kaki rata (flat foot).<br>
-                                        • Badan terlalu tegak atau membongkok.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td>
-                                    <td>
-                                        • Teknik larian salah sepenuhnya.<br>
-                                        • Tiada koordinasi tangan dan kaki.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Fasa Penamat -->
-                    <div class="bg-white p-4 rounded shadow-sm border">
-                        <h4 class="font-bold text-green-800 border-b pb-2 mb-2">3. Fasa Penamat (5%)</h4>
-                        <table class="w-full rubric-table">
-                            <thead>
-                                <tr>
-                                    <th width="15%">Tahap</th>
-                                    <th width="10%">Markah</th>
-                                    <th>Kriteria (Torso, Momentum)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td>
-                                    <td>
-                                        • Mengekalkan momentum melepasi garisan.<br>
-                                        • Menolak bahagian torso (dada) ke hadapan (dipping) dengan tepat di garisan penamat.<br>
-                                        • Mengekalkan kepantasan dan imbangan badan yang stabil.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td>
-                                    <td>
-                                        • Mengekalkan momentum.<br>
-                                        • Melakukan teknik 'dipping' dada dengan baik.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td>
-                                    <td>
-                                        • Momentum agak berkurang.<br>
-                                        • Melintasi garisan tanpa teknik 'dipping' yang jelas.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td>
-                                    <td>
-                                        • Memperlahankan larian sebelum garisan.<br>
-                                        • Tidak mengekalkan kepantasan.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td>
-                                    <td>
-                                        • Berhenti mengejut atau melompat di garisan penamat.<br>
-                                        • Teknik penamat salah.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="bg-white p-4 rounded shadow-sm border"><h4 class="font-bold text-green-800 border-b pb-2 mb-2">Fasa Permulaan, Larian & Penamat</h4><p class="text-xs">Sila rujuk rubrik penuh di dalam sistem untuk butiran markah 0-10.</p></div>
                 </div>
-
-                <!-- Kandungan Padang -->
                 <div id="rubric-content-padang" class="hidden space-y-6">
-                    <!-- Fasa Persediaan -->
-                    <div class="bg-white p-4 rounded shadow-sm border">
-                        <h4 class="font-bold text-green-800 border-b pb-2 mb-2">1. Fasa Persediaan (5%)</h4>
-                        <table class="w-full rubric-table">
-                            <thead>
-                                <tr>
-                                    <th width="15%">Tahap</th>
-                                    <th width="10%">Markah</th>
-                                    <th>Kriteria (Pegangan, Kedudukan)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td>
-                                    <td>
-                                        • Peluru tidak menyentuh tapak tangan (pangkal 3/5 jari).<br>
-                                        • Peluru diletakkan rapat di sisi leher/bawah telinga.<br>
-                                        • Berdiri membelakangkan kawasan lontaran dengan stabil.<br>
-                                        • Teknik persediaan betul dan tepat.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td>
-                                    <td>
-                                        • Peluru tidak menyentuh tapak tangan.<br>
-                                        • Kedudukan peluru di leher betul.<br>
-                                        • Posisi badan stabil.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td>
-                                    <td>
-                                        • Peluru tidak menyentuh tapak tangan.<br>
-                                        • Kedudukan peluru <strong>tidak</strong> menyentuh sisi leher dengan tepat.<br>
-                                        • Teknik betul perlu dibaiki.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td>
-                                    <td>
-                                        • Peluru menyentuh tapak tangan.<br>
-                                        • Tidak memegang di pangkal jari.<br>
-                                        • Kedudukan peluru salah. Tidak membelakangkan kawasan.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td>
-                                    <td>
-                                        • Teknik pegangan dan persediaan salah sepenuhnya.<br>
-                                        • Peluru jauh dari leher (Bahaya).
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Fasa Lungsuran -->
-                    <div class="bg-white p-4 rounded shadow-sm border">
-                        <h4 class="font-bold text-green-800 border-b pb-2 mb-2">2. Fasa Lungsuran (5%)</h4>
-                        <table class="w-full rubric-table">
-                            <thead>
-                                <tr>
-                                    <th width="15%">Tahap</th>
-                                    <th width="10%">Markah</th>
-                                    <th>Kriteria (Glide)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td>
-                                    <td>
-                                        • Melungsur (Glide) kedua-dua kaki dengan pantas dan rendah.<br>
-                                        • Kaki kanan mendarat di pusat bulatan dengan seimbang.<br>
-                                        • Kaki kiri mendarat di papan penahan serentak.<br>
-                                        • Keseimbangan badan dan peluru di leher terjaga.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td>
-                                    <td>
-                                        • Melungsur kedua-dua kaki.<br>
-                                        • Pendaratan kaki betul.<br>
-                                        • Keseimbangan badan terjaga.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td>
-                                    <td>
-                                        • Melungsur kedua-dua kaki.<br>
-                                        • Kurang pantas atau lungsuran agak tinggi.<br>
-                                        • Teknik betul perlu dibaiki.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td>
-                                    <td>
-                                        • Tidak melungsurkan kaki serentak.<br>
-                                        • Kaki tidak dalam bulatan.<br>
-                                        • Tidak pantas.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td>
-                                    <td>
-                                        • Tiada lungsuran (hanya berjalan atau melangkah).<br>
-                                        • Hilang keseimbangan.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Fasa Lontaran -->
-                    <div class="bg-white p-4 rounded shadow-sm border">
-                        <h4 class="font-bold text-green-800 border-b pb-2 mb-2">3. Fasa Lontaran (10%)</h4>
-                        <table class="w-full rubric-table">
-                            <thead>
-                                <tr>
-                                    <th width="15%">Tahap</th>
-                                    <th width="10%">Markah</th>
-                                    <th>Kriteria (Kilasan, Tolakan)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td>
-                                    <td>
-                                        • Memusingkan pinggang ke kiri dan ke atas serentak dengan kilasan badan.<br>
-                                        • Menolak dengan meluruskan lutut dan pinggang.<br>
-                                        • Ekstensi tangan penuh (sudut 45 darjah).<br>
-                                        • Teknik "Putting" (Menolak) bukan membaling.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td>
-                                    <td>
-                                        • Memusingkan pinggang serentak.<br>
-                                        • Menolak lutut lurus. Ekstensi tangan penuh.<br>
-                                        • Pemindahan berat badan baik.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td>
-                                    <td>
-                                        • Kurang memusingkan pinggang.<br>
-                                        • Kurang menolak lutut.<br>
-                                        • Sudut pelepasan kurang tepat.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td>
-                                    <td>
-                                        • Kurang memusingkan pinggang.<br>
-                                        • Sudut pelepasan terlalu rendah atau tinggi.<br>
-                                        • Tolakan sederhana.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td>
-                                    <td>
-                                        • Teknik salah (Membaling/Throwing).<br>
-                                        • Siku turun ke bawah.<br>
-                                        • Tiada kuasa tolakan.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Fasa Pulihan -->
-                    <div class="bg-white p-4 rounded shadow-sm border">
-                        <h4 class="font-bold text-green-800 border-b pb-2 mb-2">4. Fasa Pulihan (5%)</h4>
-                        <table class="w-full rubric-table">
-                            <thead>
-                                <tr>
-                                    <th width="15%">Tahap</th>
-                                    <th width="10%">Markah</th>
-                                    <th>Kriteria (Imbangan, Reverse)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">4.5 - 5.0</td>
-                                    <td>
-                                        • Melakukan imbangan badan (Reverse) selepas lontaran.<br>
-                                        • Kaki kanan dibawa ke hadapan dengan membengkokkan kaki.<br>
-                                        • Tidak terkeluar dari bulatan. Keluar mengikut bahagian belakang sektor.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td><td class="text-center font-bold">3.8 - 4.4</td>
-                                    <td>
-                                        • Imbangan badan baik. Kaki kanan dibawa ke hadapan.<br>
-                                        • Tidak terkeluar dari bulatan. Keluar ikut belakang.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td><td class="text-center font-bold">3.0 - 3.7</td>
-                                    <td>
-                                        • Kurang imbangan. Kaki kanan dibawa ke hadapan.<br>
-                                        • Hampir terbatal tetapi berjaya dikawal. Keluar ikut belakang.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td><td class="text-center font-bold">2.5 - 2.9</td>
-                                    <td>
-                                        • Kurang imbangan.<br>
-                                        • Kaki kanan dibawa ke hadapan pada masa tidak sama.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td><td class="text-center font-bold">0.0 - 2.4</td>
-                                    <td>
-                                        • Tidak berjaya imbang.<br>
-                                        • Terus keluar ikut depan (BATAL) atau jatuh keluar bulatan.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="bg-white p-4 rounded shadow-sm border"><h4 class="font-bold text-green-800 border-b pb-2 mb-2">Fasa Lontar Peluru</h4><p class="text-xs">Sila rujuk rubrik penuh di dalam sistem untuk butiran markah 0-10.</p></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL RUBRIK HP7 (PENYEDIAAN) - VERSI PENUH -->
     <div id="rubric-hp7-modal" class="rubric-modal hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
             <div class="bg-yellow-600 text-white p-4 flex justify-between items-center shrink-0">
-                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-tools"></i> Panduan Rubrik HP7 (Penyediaan Trek & Sektor)</h3>
+                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-tools"></i> Panduan Rubrik HP7</h3>
                 <button onclick="toggleRubricHP7(false)" class="hover:bg-yellow-500 p-2 rounded-full transition"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <div class="p-5 overflow-y-auto bg-gray-50 flex-1">
-                <div class="space-y-6">
-                    <!-- Penyediaan Trek -->
-                    <div class="bg-white p-4 rounded shadow-sm border">
-                        <h4 class="font-bold text-yellow-800 border-b pb-2 mb-2">1. Penyediaan Trek (10%)</h4>
-                        <table class="w-full rubric-table">
-                            <thead><tr><th width="15%">Tahap</th><th width="10%">Markah</th><th>Kriteria</th></tr></thead>
-                            <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td>
-                                    <td>
-                                        • Ukuran trek sangat tepat dengan semua lorong dan garisan memenuhi spesifikasi (lorong 1.22m, garisan 5cm).<br>
-                                        • Menyediakan petak asas dengan teknik dan langkah yang betul.<br>
-                                        • Semua aspek keselamatan dipatuhi sepenuhnya.<br>
-                                        • Menggunakan alatan yang sesuai dan berkesan.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td>
-                                    <td>
-                                        • Ukuran trek tepat dengan keluasan lorong memenuhi standard.<br>
-                                        • Menyediakan petak asas dengan teknik dan langkah yang betul.<br>
-                                        • Garisan memenuhi spesifikasi dan konsisten.<br>
-                                        • Semua aspek keselamatan dipatuhi.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td>
-                                    <td>
-                                        • Ukuran trek hampir tepat, sedikit ketidaktepatan pada lorong.<br>
-                                        • Menyediakan petak asas.<br>
-                                        • Garisan memenuhi spesifikasi tetapi tidak konsisten.<br>
-                                        • Sebahagian besar aspek keselamatan dipatuhi.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td>
-                                    <td>
-                                        • Ukuran trek agak tidak tepat.<br>
-                                        • Menyediakan petak asas.<br>
-                                        • Garisan lebar tidak konsisten.<br>
-                                        • Sebahagian langkah keselamatan dipatuhi.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td>
-                                    <td>
-                                        • Ukuran trek tidak tepat.<br>
-                                        • Menyediakan petak asas.<br>
-                                        • Garisan tidak mengikut spesifikasi.<br>
-                                        • Tidak mengambil langkah keselamatan.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Penyediaan Sektor -->
-                    <div class="bg-white p-4 rounded shadow-sm border">
-                        <h4 class="font-bold text-yellow-800 border-b pb-2 mb-2">2. Penyediaan Sektor (10%)</h4>
-                        <table class="w-full rubric-table">
-                            <thead><tr><th width="15%">Tahap</th><th width="10%">Markah</th><th>Kriteria</th></tr></thead>
-                            <tbody>
-                                <tr class="bg-level-5">
-                                    <td class="font-bold">Amat Cemerlang</td><td class="text-center font-bold">9.0 - 10</td>
-                                    <td>
-                                        • Ukuran sudut sektor balingan sangat tepat (34.92 darjah).<br>
-                                        • Bulatan (2.135m) dan papan penahan dipasang kemas.<br>
-                                        • Garisan sektor jelas dan lurus dari pusat bulatan.<br>
-                                        • Zon keselamatan kiri kanan sektor bebas bahaya.<br>
-                                        • Menguasai kemahiran menyediakan sektor mengikut teknik dan aturan yang betul.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-4">
-                                    <td class="font-bold">Cemerlang</td><td class="text-center font-bold">7.5 - 8.9</td>
-                                    <td>
-                                        • Ukuran sudut sektor tepat.<br>
-                                        • Pemasangan alatan baik.<br>
-                                        • Zon keselamatan memuaskan.<br>
-                                        • Menguasai kemahiran menyediakan sektor mengikut teknik dan aturan yang betul.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-3">
-                                    <td class="font-bold">Kepujian</td><td class="text-center font-bold">6.0 - 7.4</td>
-                                    <td>
-                                        • Ukuran sudut sektor hampir tepat.<br>
-                                        • Garisan sektor kurang konsisten.<br>
-                                        • Menguasai kemahiran menyediakan sektor tapi tidak mengikut teknik namun melaksanakan dengan aturan yang betul.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-2">
-                                    <td class="font-bold">Sederhana</td><td class="text-center font-bold">5.0 - 5.9</td>
-                                    <td>
-                                        • Ukuran sudut sektor kurang tepat.<br>
-                                        • Garisan sektor tidak jelas.<br>
-                                        • Menguasai kemahiran menyediakan sektor dan mengikut teknik tetapi tidak melaksanakan aturan yang betul.
-                                    </td>
-                                </tr>
-                                <tr class="bg-level-1">
-                                    <td class="font-bold">Lemah</td><td class="text-center font-bold">&lt; 4.9</td>
-                                    <td>
-                                        • Ukuran sudut sektor sangat tidak tepat.<br>
-                                        • Tiada papan penahan / Kawasan berbahaya.<br>
-                                        • Tidak menguasai kemahiran menyediakan sektor.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            <div class="p-5 overflow-y-auto bg-gray-50 flex-1"><p>Ukuran tepat dan zon keselamatan (10% Trek, 10% Sektor).</p></div>
         </div>
     </div>
 
-    <!-- SKRIN LOG MASUK -->
     <div id="login-view" class="fixed inset-0 login-bg z-[60] flex items-center justify-center p-4">
         <div class="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-yellow-500 relative z-10">
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4">
-                    <i class="fas fa-graduation-cap text-3xl"></i>
-                </div>
-                <h1 class="text-3xl font-extrabold text-slate-800">MPU3411 KOKURIKULUM OLAHRAGA</h1>
-                <p class="text-slate-500 font-medium">Sistem Pengurusan Markah</p>
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4"><i class="fas fa-graduation-cap text-3xl"></i></div>
+                <h1 class="text-3xl font-extrabold text-slate-800">MPU3411 OLAHRAGA</h1>
+                <p class="text-slate-500 font-medium text-sm uppercase">Sistem Pengurusan Markah</p>
             </div>
             <form id="login-form" class="space-y-5">
                 <div><label class="block text-sm font-bold text-slate-700 mb-1">Emel Rasmi</label><input type="email" id="email" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required placeholder="admin@sekolah.com"></div>
                 <div><label class="block text-sm font-bold text-slate-700 mb-1">Kata Laluan</label><input type="password" id="password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required></div>
                 <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg">LOG MASUK</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Versi 7.3 |h@NIFFfaizal</p>
+            <p class="text-xs text-center text-gray-400 mt-6">Versi 8.0 | h@NIFFfaizal</p>
         </div>
     </div>
 
-    <!-- APLIKASI UTAMA -->
     <div id="app-container" class="hidden">
         <header class="fixed-header bg-slate-900 text-white shadow-xl flex flex-col justify-center">
             <div class="px-6 flex justify-between items-center h-full max-w-7xl mx-auto w-full">
@@ -643,17 +116,42 @@
 
         <div class="main-content-area max-w-7xl mx-auto px-4">
             
-            <!-- DASHBOARD -->
             <section id="dashboard" class="content-section block">
                 <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg mb-6 text-sm flex items-center gap-2">
                     <i class="fas fa-info-circle"></i> <span>Data untuk kelas: <span id="user-class-badge" class="font-bold underline">...</span></span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white p-5 rounded-xl border shadow-sm"><h3 class="text-xs font-bold text-slate-500">PELAJAR</h3><p class="text-3xl font-extrabold mt-2" id="dash-total">0</p></div>
-                    <div class="bg-white p-5 rounded-xl border shadow-sm border-blue-100"><h3 class="text-xs font-bold text-blue-600">UJIAN SELESAI</h3><p class="text-3xl font-extrabold text-blue-700 mt-2" id="dash-ujian">0</p></div>
-                    <div class="bg-white p-5 rounded-xl border shadow-sm border-green-100"><h3 class="text-xs font-bold text-green-600">HP3 SELESAI</h3><p class="text-3xl font-extrabold text-green-700 mt-2" id="dash-hp3">0</p></div>
-                    <div class="bg-white p-5 rounded-xl border shadow-sm border-yellow-100"><h3 class="text-xs font-bold text-yellow-600">HP7 SELESAI</h3><p class="text-3xl font-extrabold text-yellow-700 mt-2" id="dash-hp7">0</p></div>
+                    <div class="bg-white p-5 rounded-xl border shadow-sm"><h3 class="text-xs font-bold text-slate-500 uppercase">Pelajar</h3><p class="text-3xl font-extrabold mt-2" id="dash-total">0</p></div>
+                    <div class="bg-white p-5 rounded-xl border shadow-sm border-blue-100"><h3 class="text-xs font-bold text-blue-600 uppercase">Ujian Selesai</h3><p class="text-3xl font-extrabold text-blue-700 mt-2" id="dash-ujian">0</p></div>
+                    <div class="bg-white p-5 rounded-xl border shadow-sm border-green-100"><h3 class="text-xs font-bold text-green-600 uppercase">HP3 Selesai</h3><p class="text-3xl font-extrabold text-green-700 mt-2" id="dash-hp3">0</p></div>
+                    <div class="bg-white p-5 rounded-xl border shadow-sm border-yellow-100"><h3 class="text-xs font-bold text-yellow-600 uppercase">HP7 Selesai</h3><p class="text-3xl font-extrabold text-yellow-700 mt-2" id="dash-hp7">0</p></div>
                 </div>
+
+                <div id="admin-analytics-area" class="hidden mt-8 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-1 bg-white p-6 rounded-xl border shadow-sm border-purple-100">
+                            <h3 class="text-sm font-bold text-purple-600 mb-6 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-chart-bar"></i> Statistik Keseluruhan</h3>
+                            <div class="space-y-6">
+                                <div class="bg-purple-50 p-4 rounded-lg">
+                                    <p class="text-xs text-purple-500 font-bold uppercase mb-1">Min (Mean)</p>
+                                    <p id="stat-mean" class="text-4xl font-black text-slate-800">0.00</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-lg">
+                                    <p class="text-xs text-slate-500 font-bold uppercase mb-1">Sisihan Piawai (SD)</p>
+                                    <p id="stat-sd" class="text-4xl font-black text-slate-800">0.00</p>
+                                </div>
+                                <p class="text-[10px] text-gray-400 italic font-medium">* Dikira berdasarkan jumlah markah (Ujian+HP3+HP7)</p>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 bg-white p-6 rounded-xl border shadow-sm">
+                            <h3 class="text-sm font-bold text-slate-700 mb-4 uppercase flex items-center gap-2"><i class="fas fa-wave-square text-blue-500"></i> Graf Loceng Sisihan Piawai (Normal Distribution)</h3>
+                            <div class="h-[250px] w-full">
+                                <canvas id="bellCurveChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
                     <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
                         <h3 class="font-bold text-gray-800">Ringkasan Prestasi</h3>
@@ -668,7 +166,6 @@
                 </div>
             </section>
 
-            <!-- UJIAN (3 BAHAGIAN SAHAJA) -->
             <section id="ujian" class="content-section">
                 <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
                     <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center"><i class="fas fa-file-alt text-blue-600 mr-2"></i> Ujian (30%)</h2>
@@ -679,23 +176,11 @@
                             <div class="md:col-span-2"><input type="text" id="name-ujian" class="w-full p-2 bg-gray-200 border rounded font-bold text-center" readonly placeholder="Nama Pelajar">
                             <input type="hidden" name="ID_SISTEM" id="id-ujian"><input type="hidden" name="Nama_Pelajar" id="hidden-name-ujian"><input type="hidden" name="Kelas" id="class-ujian"></div>
                         </div>
-                        
-                        <!-- 3 BAHAGIAN UTAMA - MARKAH DIKEMASKINI -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <div class="bg-white p-4 rounded border shadow-sm text-center">
-                                <label class="font-bold text-blue-900 block mb-2 text-sm">BAHAGIAN A (Max 20)</label>
-                                <input type="number" name="Bahagian_A" class="score-in w-full p-3 border-2 border-blue-200 rounded text-center font-bold text-2xl focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" max="20" placeholder="0">
-                            </div>
-                            <div class="bg-white p-4 rounded border shadow-sm text-center">
-                                <label class="font-bold text-blue-900 block mb-2 text-sm">BAHAGIAN B (Max 5)</label>
-                                <input type="number" name="Bahagian_B" class="score-in w-full p-3 border-2 border-blue-200 rounded text-center font-bold text-2xl focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" max="5" placeholder="0">
-                            </div>
-                            <div class="bg-white p-4 rounded border shadow-sm text-center">
-                                <label class="font-bold text-blue-900 block mb-2 text-sm">BAHAGIAN C (Max 5)</label>
-                                <input type="number" name="Bahagian_C" class="score-in w-full p-3 border-2 border-blue-200 rounded text-center font-bold text-2xl focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" max="5" placeholder="0">
-                            </div>
+                            <div class="bg-white p-4 rounded border shadow-sm text-center"><label class="font-bold text-blue-900 block mb-2 text-sm">BAHAGIAN A (Max 20)</label><input type="number" name="Bahagian_A" class="score-in w-full p-3 border-2 border-blue-200 rounded text-center font-bold text-2xl focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" max="20" placeholder="0"></div>
+                            <div class="bg-white p-4 rounded border shadow-sm text-center"><label class="font-bold text-blue-900 block mb-2 text-sm">BAHAGIAN B (Max 5)</label><input type="number" name="Bahagian_B" class="score-in w-full p-3 border-2 border-blue-200 rounded text-center font-bold text-2xl focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" max="5" placeholder="0"></div>
+                            <div class="bg-white p-4 rounded border shadow-sm text-center"><label class="font-bold text-blue-900 block mb-2 text-sm">BAHAGIAN C (Max 5)</label><input type="number" name="Bahagian_C" class="score-in w-full p-3 border-2 border-blue-200 rounded text-center font-bold text-2xl focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" max="5" placeholder="0"></div>
                         </div>
-
                         <div class="flex justify-between items-center border-t pt-4">
                             <div class="font-bold text-gray-700">Jumlah: <span id="total-ujian" class="text-blue-600 text-2xl">0</span> / 30</div>
                             <input type="hidden" name="Jumlah_Ujian" id="val-total-ujian">
@@ -705,7 +190,6 @@
                 </div>
             </section>
 
-            <!-- HP3 SECTION -->
             <section id="hp3" class="content-section">
                 <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
                     <div class="flex justify-between items-center border-b pb-4 mb-6">
@@ -740,7 +224,6 @@
                 </div>
             </section>
 
-            <!-- HP7 SECTION -->
             <section id="hp7" class="content-section">
                 <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
                     <div class="flex justify-between items-center border-b pb-4 mb-6">
@@ -761,23 +244,21 @@
                     </form>
                 </div>
             </section>
-
         </div>
     </div>
 
     <script>
         // ============================================
-        // PASTE URL SCRIPT ANDA DI SINI
+        // WEB APP URL
         // ============================================
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJSoyfmId5JEUyTfu-IIJqDdjLfQ6OxtiZdPQqMOBlx3w75Mdf09JCeaD2l-LBTyd1/exec";
-        // ============================================
 
         let currentUser = null;
         let allStudents = [];
         let existingScores = {};
         let filteredStudentsCache = [];
+        let bellChart = null; // Globals for chart instance
 
-        // --- DATA NORMALIZER ---
         function normalizeData(students) {
             return students.map(s => {
                 const kelas = s.Kelas || s.KELAS || s.kelas || "TIADA KELAS";
@@ -793,40 +274,35 @@
             return isNaN(num) ? 0 : num;
         }
 
-        // --- RUBRIC LOGIC ---
         function toggleRubric(show) { document.getElementById('rubric-modal').classList.toggle('hidden', !show); }
         function toggleRubricHP7(show) { document.getElementById('rubric-hp7-modal').classList.toggle('hidden', !show); }
-        
         function switchRubricTab(tabName) {
             document.getElementById('rubric-content-balapan').classList.toggle('hidden', tabName !== 'balapan');
             document.getElementById('rubric-content-padang').classList.toggle('hidden', tabName !== 'padang');
-            document.getElementById('tab-btn-balapan').className = tabName === 'balapan' ? "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition" : "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 transition";
-            document.getElementById('tab-btn-padang').className = tabName === 'padang' ? "flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white transition" : "flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-green-700 transition";
         }
 
-        // --- NAV & UI ---
         function nav(id) {
             document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
             document.getElementById(id).style.display = 'block';
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-100', 'text-blue-700', 'active'));
             document.getElementById(`btn-${id}`).classList.add('bg-blue-100', 'text-blue-700', 'active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
         function showToast(msg, type='success') {
             const t = document.createElement('div'); t.className = `toast ${type}`;
             t.innerHTML = `<span>${msg}</span>`; document.getElementById('toast-container').appendChild(t);
             requestAnimationFrame(() => t.classList.add('show')); setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300) }, 3000);
         }
+
         function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
 
-        // --- LOGIN ---
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault(); showLoader(true);
             fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email: document.getElementById('email').value.trim(), password: document.getElementById('password').value.trim() }) })
             .then(res => res.json()).then(data => {
-                if (data.result === 'success') { 
-                    currentUser = { ...data.user, kelas: (data.user.kelas || "ALL").toString().trim() }; 
-                    initApp(); 
+                if (data.result === 'success') { 
+                    currentUser = { ...data.user, role: data.user.role.toUpperCase(), kelas: (data.user.kelas || "ALL").toString().trim() }; 
+                    initApp(); 
                 } else { showToast(data.message, 'error'); showLoader(false); }
             }).catch(() => { showToast("Ralat sambungan", 'error'); showLoader(false); });
         });
@@ -836,25 +312,23 @@
             document.getElementById('app-container').classList.remove('hidden');
             document.getElementById('user-display-name').innerText = currentUser.nama;
             document.getElementById('user-role-display').innerText = currentUser.role;
-            const assignedClass = currentUser.kelas || "SEMUA";
-            document.getElementById('user-class-badge').innerText = assignedClass;
-            
+            document.getElementById('user-class-badge').innerText = currentUser.kelas;
             nav('dashboard');
             
-            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'get_data', email: currentUser.email, role: currentUser.role }) })
+            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'get_data', email: currentUser.email, role: currentUser.role.toLowerCase() }) })
             .then(res => res.json()).then(data => {
                 if(data.result === 'success'){
-                    allStudents = normalizeData(data.data.students); 
+                    allStudents = normalizeData(data.data.students); 
                     existingScores = data.data.scores;
-                    updateDashboard(); 
+                    updateDashboard(); 
                     initDropdowns('ujian'); initDropdowns('hp3'); initDropdowns('hp7');
                 } else { showToast(data.message, 'error'); }
                 showLoader(false);
             });
         }
+
         function logout() { if(confirm("Log keluar?")) location.reload(); }
 
-        // --- FORMS & DROPDOWN ---
         function initDropdowns(suffix) {
             const sel = document.getElementById(`sel-class-${suffix}`);
             sel.innerHTML = '<option value="">-- Pilih Kelas --</option>';
@@ -866,20 +340,19 @@
                 Array.from(classesToShow).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
             }
         }
+
         function filterStudents(suffix) {
             const cls = document.getElementById(`sel-class-${suffix}`).value;
             const studentSel = document.getElementById(`sel-student-${suffix}`);
             studentSel.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
-            
-            // Check if search input exists before accessing it (to fix TypeError in Ujian section)
             const searchInput = document.getElementById(`search-student-${suffix}`);
             if (searchInput) searchInput.value = '';
-
             if(!cls) { studentSel.disabled = true; filteredStudentsCache = []; return; }
             studentSel.disabled = false;
             filteredStudentsCache = allStudents.filter(s => s.Kelas === cls);
             populateStudentDropdown(suffix, filteredStudentsCache);
         }
+
         function populateStudentDropdown(suffix, students) {
             const studentSel = document.getElementById(`sel-student-${suffix}`);
             studentSel.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
@@ -888,15 +361,18 @@
                 studentSel.innerHTML += `<option value="${s.ID_SISTEM}">${mark}${s.Nama_Pelajar}</option>`;
             });
         }
+
         function searchDropdown(suffix) {
             const query = document.getElementById(`search-student-${suffix}`).value.toLowerCase();
             const filtered = filteredStudentsCache.filter(s => s.Nama_Pelajar.toLowerCase().includes(query));
             populateStudentDropdown(suffix, filtered);
         }
+
         function checkDone(suffix, id) {
             let sheet = suffix === 'ujian' ? 'MARKAH_UJIAN' : suffix === 'hp3' ? 'MARKAH_AMALI_HP3' : 'MARKAH_HP7';
             return existingScores[sheet] && existingScores[sheet][id];
         }
+
         function loadStudentData(suffix) {
             const id = document.getElementById(`sel-student-${suffix}`).value;
             if (!id) return;
@@ -912,64 +388,57 @@
                 if (existingScores[sheetKey] && existingScores[sheetKey][id]) {
                     const d = existingScores[sheetKey][id];
                     const form = document.getElementById(`form-${suffix}`);
-                    if (suffix === 'ujian') { 
-                        fill(form, 'Bahagian_A', d[5]); 
-                        fill(form, 'Bahagian_B', d[6]); 
-                        fill(form, 'Bahagian_C', d[7]); 
-                    } 
+                    if (suffix === 'ujian') { fill(form, 'Bahagian_A', d[5]); fill(form, 'Bahagian_B', d[6]); fill(form, 'Bahagian_C', d[7]); } 
                     else if (suffix === 'hp3') { fill(form, 'HP3_Permulaan_10', d[5]); fill(form, 'HP3_Larian_10', d[6]); fill(form, 'HP3_Penamat_5', d[7]); fill(form, 'HP3_Persediaan_5', d[8]); fill(form, 'HP3_Lungsuran_5', d[9]); fill(form, 'HP3_Lontaran_10', d[10]); fill(form, 'HP3_Pulihan_5', d[11]); }
                     else if (suffix === 'hp7') { fill(form, 'HP7_Penyediaan_Trek_10', d[5]); fill(form, 'HP7_Penyediaan_Sektor_10', d[6]); }
                     calculateTotal(suffix); showToast("Markah dimuatkan.", "success");
                 }
             }
         }
+
         function fill(form, name, val) { const inp = form.querySelector(`[name="${name}"]`); if(inp) inp.value = val; }
-        
-        // --- CALCULATION ---
+
         document.querySelectorAll('.score-in, .score-in-hp3, .score-in-hp7').forEach(i => {
             i.addEventListener('input', function() {
                 let suffix = this.classList.contains('score-in') ? 'ujian' : this.classList.contains('score-in-hp3') ? 'hp3' : 'hp7';
                 calculateTotal(suffix);
             });
         });
+
         function calculateTotal(suffix) {
             let total = 0; let cls = suffix === 'ujian' ? '.score-in' : suffix === 'hp3' ? '.score-in-hp3' : '.score-in-hp7';
             document.querySelectorAll(`#form-${suffix} ${cls}`).forEach(inp => {
                 let v = parseFloat(inp.value) || 0; let max = parseFloat(inp.getAttribute('max') || 100);
-                if(v > max) { inp.value = max; v = max; inp.classList.add('border-red-500'); showToast(`Maksimum ${max}`, 'error'); } else { inp.classList.remove('border-red-500'); }
+                if(v > max) { inp.value = max; v = max; }
                 total += v;
             });
             document.getElementById(`total-${suffix}`).innerText = total.toFixed(1);
             document.getElementById(`val-total-${suffix}`).value = total.toFixed(1);
         }
 
-        // --- SUBMIT ---
         function handleFormSubmit(e, sheetName) {
             e.preventDefault(); if (!confirm("Simpan?")) return; showLoader(true);
             const formData = new FormData(e.target); const dataObj = {}; formData.forEach((value, key) => dataObj[key] = value);
-            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'save_mark', sheetName: sheetName, userEmail: currentUser.email, role: currentUser.role, formData: dataObj }) })
+            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'save_mark', sheetName: sheetName, userEmail: currentUser.email, role: currentUser.role.toLowerCase(), formData: dataObj }) })
             .then(res => res.json()).then(res => {
-                if (res.result === 'success') { showToast("Disimpan!", 'success'); if(!existingScores[sheetName]) existingScores[sheetName] = {}; initApp(); } 
-                else { showToast("Ralat: " + res.message, 'error'); showLoader(false); }
+                if (res.result === 'success') { showToast("Disimpan!", 'success'); initApp(); } 
+                else { showToast(res.message, 'error'); showLoader(false); }
             }).catch(() => { showToast("Ralat rangkaian", 'error'); showLoader(false); });
         }
 
-        // --- DASHBOARD RENDER ---
         function updateDashboard() {
             let targetStudents = allStudents;
             const assignedClass = currentUser.kelas;
             if (currentUser.role === 'PENSYARAH' || (assignedClass && assignedClass !== 'ALL')) {
                 targetStudents = allStudents.filter(s => s.Kelas === assignedClass);
             }
-            const totalStudents = targetStudents.length;
+            document.getElementById('dash-total').innerText = targetStudents.length;
             let cU=0, cHP3=0, cHP7=0;
             targetStudents.forEach(s => {
-                const id = s.ID_SISTEM;
-                if (existingScores['MARKAH_UJIAN'] && existingScores['MARKAH_UJIAN'][id]) cU++;
-                if (existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][id]) cHP3++;
-                if (existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][id]) cHP7++;
+                if (existingScores['MARKAH_UJIAN'] && existingScores['MARKAH_UJIAN'][s.ID_SISTEM]) cU++;
+                if (existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][s.ID_SISTEM]) cHP3++;
+                if (existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][s.ID_SISTEM]) cHP7++;
             });
-            document.getElementById('dash-total').innerText = totalStudents;
             document.getElementById('dash-ujian').innerText = cU;
             document.getElementById('dash-hp3').innerText = cHP3;
             document.getElementById('dash-hp7').innerText = cHP7;
@@ -985,40 +454,131 @@
                 filterSel.disabled = true;
             }
             renderDashboardTable();
+
+            // KAWALAN PAPARAN ADMIN ANALYTICS
+            if(currentUser.role === 'ADMIN') {
+                document.getElementById('admin-analytics-area').classList.remove('hidden');
+                calculateAdminStats();
+            } else {
+                document.getElementById('admin-analytics-area').classList.add('hidden');
+            }
         }
 
         function renderDashboardTable() {
             const tbody = document.getElementById('dashboard-table-body');
             let filterClass = document.getElementById('dash-filter-class').value;
-            if (currentUser.role !== 'ADMIN' && currentUser.kelas && currentUser.kelas !== 'ALL') filterClass = currentUser.kelas;
             tbody.innerHTML = '';
             let studentsToRender = (filterClass !== 'all') ? allStudents.filter(s => s.Kelas === filterClass) : allStudents;
-
-            if(studentsToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 font-bold">Tiada pelajar dijumpai.</td></tr>'; return; }
+            if(studentsToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4">Tiada data.</td></tr>'; return; }
 
             studentsToRender.forEach(s => {
                 const id = s.ID_SISTEM;
-                const sUjian = existingScores['MARKAH_UJIAN'] && existingScores['MARKAH_UJIAN'][id];
-                const sHP3 = existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][id];
-                const sHP7 = existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][id];
+                const sU = existingScores['MARKAH_UJIAN'] && existingScores['MARKAH_UJIAN'][id];
+                const sH3 = existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][id];
+                const sH7 = existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][id];
 
-                // Logic Pengiraan Total untuk Dashboard (Pastikan index betul dengan sheet baru)
-                // Ujian: Col F(5), G(6), H(7) = Bahagian A, B, C
-                const valUjian = sUjian ? (cleanNumber(sUjian[5]) + cleanNumber(sUjian[6]) + cleanNumber(sUjian[7])).toFixed(1) : '-';
-                // HP3: Col 5-11 (7 items)
-                const valHP3 = sHP3 ? [5,6,7,8,9,10,11].reduce((acc, idx) => acc + cleanNumber(sHP3[idx]), 0).toFixed(1) : '-';
-                // HP7: Col 5-6 (2 items)
-                const valHP7 = sHP7 ? (cleanNumber(sHP7[5]) + cleanNumber(sHP7[6])).toFixed(1) : '-';
+                const valUjian = sU ? (cleanNumber(sU[5]) + cleanNumber(sU[6]) + cleanNumber(sU[7])).toFixed(1) : '-';
+                const valHP3 = sH3 ? [5,6,7,8,9,10,11].reduce((acc, idx) => acc + cleanNumber(sH3[idx]), 0).toFixed(1) : '-';
+                const valHP7 = sH7 ? (cleanNumber(sH7[5]) + cleanNumber(sH7[6])).toFixed(1) : '-';
                 
-                let totalScore = 0;
-                if(valUjian !== '-') totalScore += parseFloat(valUjian);
-                if(valHP3 !== '-') totalScore += parseFloat(valHP3);
-                if(valHP7 !== '-') totalScore += parseFloat(valHP7);
+                let total = 0;
+                if(valUjian !== '-') total += parseFloat(valUjian);
+                if(valHP3 !== '-') total += parseFloat(valHP3);
+                if(valHP7 !== '-') total += parseFloat(valHP7);
                 
                 const isComplete = (valUjian !== '-' && valHP3 !== '-' && valHP7 !== '-');
-                const status = isComplete ? '<span class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold">Lengkap</span>' : '<span class="px-2 py-1 rounded bg-gray-100 text-gray-500 text-xs font-bold">Dalam Proses</span>';
+                const status = isComplete ? '<span class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold">Lengkap</span>' : '<span class="px-2 py-1 rounded bg-gray-100 text-gray-500 text-xs font-bold">Proses</span>';
 
-                tbody.innerHTML += `<tr><td class="font-bold text-slate-700">${s.Nama_Pelajar}</td><td>${s.Kelas}</td><td class="text-center">${valUjian}</td><td class="text-center">${valHP3}</td><td class="text-center">${valHP7}</td><td class="text-center font-bold text-blue-600">${totalScore > 0 ? totalScore.toFixed(1) : '-'}</td><td class="text-center">${status}</td></tr>`;
+                tbody.innerHTML += `<tr><td class="font-bold">${s.Nama_Pelajar}</td><td>${s.Kelas}</td><td class="text-center">${valUjian}</td><td class="text-center">${valHP3}</td><td class="text-center">${valHP7}</td><td class="text-center font-bold text-blue-600">${total > 0 ? total.toFixed(1) : '-'}</td><td class="text-center">${status}</td></tr>`;
+            });
+        }
+
+        // ============================================
+        // ADMIN ANALYTICS LOGIC (BARU)
+        // ============================================
+        function calculateAdminStats() {
+            const allTotals = [];
+            allStudents.forEach(s => {
+                const id = s.ID_SISTEM;
+                const sU = existingScores['MARKAH_UJIAN']?.[id];
+                const sH3 = existingScores['MARKAH_AMALI_HP3']?.[id];
+                const sH7 = existingScores['MARKAH_HP7']?.[id];
+
+                if (sU || sH3 || sH7) {
+                    let sum = 0;
+                    if(sU) sum += (cleanNumber(sU[5]) + cleanNumber(sU[6]) + cleanNumber(sU[7]));
+                    if(sH3) sum += [5,6,7,8,9,10,11].reduce((acc, idx) => acc + cleanNumber(sH3[idx]), 0);
+                    if(sH7) sum += (cleanNumber(sH7[5]) + cleanNumber(sH7[6]));
+                    allTotals.push(sum);
+                }
+            });
+
+            if (allTotals.length === 0) return;
+
+            // 1. Kira Min
+            const mean = allTotals.reduce((a, b) => a + b, 0) / allTotals.length;
+            
+            // 2. Kira Sisihan Piawai (Standard Deviation)
+            const variance = allTotals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / allTotals.length;
+            const sd = Math.sqrt(variance);
+
+            document.getElementById('stat-mean').innerText = mean.toFixed(2);
+            document.getElementById('stat-sd').innerText = sd.toFixed(2);
+
+            renderBellCurve(mean, sd);
+        }
+
+        function renderBellCurve(mean, sd) {
+            const ctx = document.getElementById('bellCurveChart').getContext('2d');
+            
+            // Generate data points for normal distribution
+            const labels = [];
+            const dataPoints = [];
+            
+            // We plot from -4 to +4 standard deviations
+            const start = mean - (4 * sd);
+            const end = mean + (4 * sd);
+            const step = (end - start) / 50;
+
+            for (let x = start; x <= end; x += step) {
+                labels.push(x.toFixed(1));
+                // Normal Distribution Formula
+                const exponent = -Math.pow(x - mean, 2) / (2 * Math.pow(sd, 2));
+                const y = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.pow(Math.E, exponent);
+                dataPoints.push(y);
+            }
+
+            if(bellChart) bellChart.destroy(); // Clear old chart
+
+            bellChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Kepadatan Taburan Normal',
+                        data: dataPoints,
+                        borderColor: '#8b5cf6', // purple-500
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        x: { 
+                            title: { display: true, text: 'Markah Keseluruhan', font: { size: 10 } },
+                            ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { size: 9 } }
+                        },
+                        y: { display: false }
+                    }
+                }
             });
         }
     </script>
