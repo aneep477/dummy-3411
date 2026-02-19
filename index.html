@@ -1,95 +1,89 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
+    <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
-        .loading-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; }
-        .active-section { display: block !important; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #1e293b; }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
-<body>
+<body class="p-4">
 
-<div id="loader" class="loading-overlay">
-    <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mb-2"></div>
-    <p>Menghubungi Server Google...</p>
-</div>
+    <div id="loader" class="loading-overlay">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-2"></div>
+        <p class="font-bold">Menghubungi Server...</p>
+    </div>
 
-<div id="login-view" class="flex min-h-screen items-center justify-center p-6">
-    <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl text-slate-800">
-        <h2 class="text-2xl font-black text-center mb-6">LOG MASUK MPU3411</h2>
+    <div id="login-view" class="max-w-md mx-auto mt-20 bg-white p-8 rounded-2xl shadow-2xl">
+        <h2 class="text-2xl font-black text-center mb-6">MPU3411 OLAHRAGA</h2>
         <form id="login-form" class="space-y-4">
-            <input type="email" id="email" placeholder="Emel" class="w-full p-3 border rounded-xl" required>
-            <input type="password" id="password" placeholder="Kata Laluan" class="w-full p-3 border rounded-xl" required>
-            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl">MASUK</button>
+            <input type="email" id="email" placeholder="Emel" class="w-full p-3 border-2 rounded-xl" required>
+            <input type="password" id="password" placeholder="Kata Laluan" class="w-full p-3 border-2 rounded-xl" required>
+            <button type="submit" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl">LOG MASUK</button>
         </form>
     </div>
-</div>
 
-<div id="app-container" class="hidden p-4">
-    <div class="max-w-4xl mx-auto bg-white p-6 rounded-2xl text-slate-800 shadow-xl">
-        <h2 class="text-xl font-bold border-b pb-2 mb-4">AMALI HP3 (VERSI RINGKAS)</h2>
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="p-4 bg-green-50 rounded-xl border border-green-200">
+    <div id="app-container" class="hidden max-w-2xl mx-auto mt-10 bg-white p-8 rounded-2xl shadow-2xl">
+        <h2 class="text-xl font-black mb-6 text-green-600">AMALI HP3 (VERSI RINGKAS)</h2>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-green-50 p-4 rounded-xl border-2">
                 <label class="block text-xs font-bold mb-2">BALAPAN (25)</label>
                 <input type="number" id="balapan-in" class="w-full p-2 border rounded text-center text-xl font-bold" max="25">
             </div>
-            <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
+            <div class="bg-blue-50 p-4 rounded-xl border-2">
                 <label class="block text-xs font-bold mb-2">PADANG (25)</label>
                 <input type="number" id="padang-in" class="w-full p-2 border rounded text-center text-xl font-bold" max="25">
             </div>
         </div>
-        <p class="text-2xl font-black text-center mb-4">JUMLAH: <span id="total-hp3">0.0</span> / 50</p>
-        <button class="w-full bg-green-600 text-white font-bold py-3 rounded-xl">SIMPAN MARKAH</button>
+        <div class="bg-slate-100 p-4 rounded-xl text-center">
+            <p class="font-black text-2xl">JUMLAH: <span id="total-hp3">0.0</span> / 50</p>
+        </div>
+        <button onclick="alert('Gunakan fungsi saveMark asal anda di sini')" class="w-full mt-4 bg-green-600 text-white font-bold py-3 rounded-xl">SIMPAN</button>
     </div>
-</div>
 
-<script>
-    // MASUKKAN URL /EXEC ANDA DI SINI
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJSoyfmId5JUQDgwqVE-6aMBLYLbQv6i5N5y7bC5SajqSjHPzt8UJUqbZ8a-LBTyd1/exec";
+    <script>
+        // 1. GANTIKAN URL DI BAWAH (PASTIKAN SATU BARIS SAHAJA)
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJSoyfmId5JUQDgwqVE-6aMBLYLbQv6i5N5y7bC5SajqSjHPzt8UJUqbZ8a-LBTyd1/exec";
 
-    document.getElementById('login-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        document.getElementById('loader').style.display = 'flex';
-        
-        const payload = {
-            action: 'login',
-            email: document.getElementById('email').value,
-            password: document.getElementById('password').value
-        };
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('loader').style.display = 'flex';
 
-        fetch(WEB_APP_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('loader').style.display = 'none';
-            if(data.result === 'success') {
-                document.getElementById('login-view').style.display = 'none';
-                document.getElementById('app-container').classList.remove('hidden');
-                alert("Selamat Datang, " + data.user.nama);
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(err => {
-            document.getElementById('loader').style.display = 'none';
-            alert("Gagal menyambung ke server. Sila pastikan URL /exec diletakkan dengan betul dalam satu baris.");
-            console.error(err);
+            const payload = {
+                action: 'login',
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('loader').style.display = 'none';
+                if (data.result === 'success') {
+                    document.getElementById('login-view').style.display = 'none';
+                    document.getElementById('app-container').classList.remove('hidden');
+                    alert("Selamat Datang, " + data.user.nama);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(err => {
+                document.getElementById('loader').style.display = 'none';
+                alert("Ralat: Pastikan URL /exec betul dan Apps Script di-deploy sebagai 'Anyone'.");
+            });
         });
-    });
 
-    // Auto-calc HP3
-    const b = document.getElementById('balapan-in');
-    const p = document.getElementById('padang-in');
-    const t = document.getElementById('total-hp3');
-    [b,p].forEach(el => el.addEventListener('input', () => {
-        t.innerText = (parseFloat(b.value || 0) + parseFloat(p.value || 0)).toFixed(1);
-    }));
-</script>
-
+        // Auto-calc
+        const b = document.getElementById('balapan-in');
+        const p = document.getElementById('padang-in');
+        [b,p].forEach(el => el.addEventListener('input', () => {
+            document.getElementById('total-hp3').innerText = (parseFloat(b.value || 0) + parseFloat(p.value || 0)).toFixed(1);
+        }));
+    </script>
 </body>
 </html>
