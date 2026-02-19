@@ -3,561 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem MPU3411 Pro (V8 Final - Analytics)</title>
+    <title>Sistem MPU3411 Pro V8 - Full Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .fixed-header { z-index: 50; top: 0; left: 0; right: 0; height: 70px; }
-        .main-content-area { padding-top: 130px; padding-bottom: 40px; min-height: 100vh; }
-        .content-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .fixed-header { z-index: 50; top: 0; height: 70px; background: #1e293b; color: white; position: fixed; width: 100%; display: flex; align-items: center; padding: 0 24px; }
+        .main-content { padding-top: 140px; padding-bottom: 40px; max-width: 1200px; margin: auto; padding-left: 15px; padding-right: 15px; }
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.95); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 10px; }
-        .toast { min-width: 300px; padding: 16px; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.3s ease-out; display: flex; align-items: center; }
-        .toast.show { transform: translateX(0); }
-        .toast.success { background-color: #10b981; }
-        .toast.error { background-color: #ef4444; }
-        .login-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); position: relative; overflow: hidden; }
-        .styled-table thead tr { background-color: #1e293b; color: #ffffff; text-align: left; }
-        .styled-table th, .styled-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
-        .styled-table tbody tr:nth-of-type(even) { background-color: #f8fafc; }
-        .rubric-modal { transition: opacity 0.3s ease; }
-        .rubric-modal.hidden { opacity: 0; pointer-events: none; }
-        .rubric-modal:not(.hidden) { opacity: 1; pointer-events: auto; }
-        .rubric-table th { background-color: #e2e8f0; border: 1px solid #cbd5e1; padding: 10px; font-size: 0.8rem; }
-        .rubric-table td { border: 1px solid #e2e8f0; vertical-align: top; padding: 10px; font-size: 0.75rem; line-height: 1.5; }
-        .bg-level-5 { background-color: #d1fae5; } 
-        .bg-level-4 { background-color: #dbeafe; } 
-        .bg-level-3 { background-color: #e0f2fe; } 
-        .bg-level-2 { background-color: #fef9c3; } 
-        .bg-level-1 { background-color: #fee2e2; } 
-        .btn-rubric-orange { background-color: #f97316; color: white; font-weight: 800; font-size: 0.9rem; padding: 10px 20px; border-radius: 8px; border: 2px solid #c2410c; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: transform 0.1s, background-color 0.2s; }
-        .btn-rubric-orange:hover { background-color: #ea580c; }
-        .btn-rubric-orange:active { transform: translateY(2px); }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 12px; color: white; display: none; z-index: 200; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); font-weight: bold; }
     </style>
 </head>
-<body class="text-gray-800">
+<body>
 
     <div id="loader" class="loading-overlay">
-        <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mb-4"></div>
-        <p id="loader-text" class="text-gray-700 font-bold animate-pulse">Sedang memproses...</p>
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-3"></div>
+        <p class="font-black text-slate-700">Berhubung dengan Server Google...</p>
     </div>
-    <div id="toast-container"></div>
+    
+    <div id="toast" class="toast"></div>
 
-    <div id="rubric-modal" class="rubric-modal hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[95vh] flex flex-col overflow-hidden">
-            <div class="bg-green-700 text-white p-4 flex justify-between items-center shrink-0">
-                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-book-open"></i> Panduan Rubrik Amali (Terperinci)</h3>
-                <button onclick="toggleRubric(false)" class="hover:bg-green-600 p-2 rounded-full transition"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <div class="flex border-b bg-gray-50 shrink-0">
-                <button onclick="switchRubricTab('balapan')" id="tab-btn-balapan" class="flex-1 py-3 px-4 text-sm font-bold text-green-700 border-b-2 border-green-700 bg-white">ACARA BALAPAN</button>
-                <button onclick="switchRubricTab('padang')" id="tab-btn-padang" class="flex-1 py-3 px-4 text-sm font-bold text-gray-500">ACARA PADANG</button>
-            </div>
-            <div class="p-5 overflow-y-auto bg-gray-50 flex-1">
-                <div id="rubric-content-balapan" class="block space-y-6">
-                    <div class="bg-white p-4 rounded shadow-sm border"><h4 class="font-bold text-green-800 border-b pb-2 mb-2">Fasa Permulaan, Larian & Penamat</h4><p class="text-xs">Sila rujuk rubrik penuh di dalam sistem untuk butiran markah 0-10.</p></div>
-                </div>
-                <div id="rubric-content-padang" class="hidden space-y-6">
-                    <div class="bg-white p-4 rounded shadow-sm border"><h4 class="font-bold text-green-800 border-b pb-2 mb-2">Fasa Lontar Peluru</h4><p class="text-xs">Sila rujuk rubrik penuh di dalam sistem untuk butiran markah 0-10.</p></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="rubric-hp7-modal" class="rubric-modal hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
-            <div class="bg-yellow-600 text-white p-4 flex justify-between items-center shrink-0">
-                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-tools"></i> Panduan Rubrik HP7</h3>
-                <button onclick="toggleRubricHP7(false)" class="hover:bg-yellow-500 p-2 rounded-full transition"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <div class="p-5 overflow-y-auto bg-gray-50 flex-1"><p>Ukuran tepat dan zon keselamatan (10% Trek, 10% Sektor).</p></div>
-        </div>
-    </div>
-
-    <div id="login-view" class="fixed inset-0 login-bg z-[60] flex items-center justify-center p-4">
-        <div class="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-yellow-500 relative z-10">
+    <div id="login-view" class="fixed inset-0 bg-slate-900 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border-t-8 border-yellow-500">
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4"><i class="fas fa-graduation-cap text-3xl"></i></div>
-                <h1 class="text-3xl font-extrabold text-slate-800">MPU3411 OLAHRAGA</h1>
-                <p class="text-slate-500 font-medium text-sm uppercase">Sistem Pengurusan Markah</p>
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 text-blue-600 mb-4"><i class="fas fa-user-shield text-3xl"></i></div>
+                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">MPU3411 OLAHRAGA</h1>
+                <p class="text-slate-400 text-xs font-bold uppercase">Sistem Pengurusan Markah</p>
             </div>
-            <form id="login-form" class="space-y-5">
-                <div><label class="block text-sm font-bold text-slate-700 mb-1">Emel Rasmi</label><input type="email" id="email" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required placeholder="admin@sekolah.com"></div>
-                <div><label class="block text-sm font-bold text-slate-700 mb-1">Kata Laluan</label><input type="password" id="password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required></div>
-                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-lg shadow-lg">LOG MASUK</button>
+            <form id="login-form" class="space-y-4">
+                <input type="email" id="email" placeholder="Emel Rasmi" class="w-full p-4 border-2 rounded-2xl focus:border-blue-500 outline-none font-bold" required>
+                <input type="password" id="password" placeholder="Kata Laluan" class="w-full p-4 border-2 rounded-2xl focus:border-blue-500 outline-none font-bold" required>
+                <button type="submit" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-blue-700 transition-all">LOG MASUK</button>
             </form>
-            <p class="text-xs text-center text-gray-400 mt-6">Versi 8.0 | h@NIFFfaizal</p>
+            <p class="text-center text-[10px] text-slate-400 mt-6 font-bold uppercase tracking-widest">Versi 8.0 | h@NIFFfaizal</p>
         </div>
     </div>
 
     <div id="app-container" class="hidden">
-        <header class="fixed-header bg-slate-900 text-white shadow-xl flex flex-col justify-center">
-            <div class="px-6 flex justify-between items-center h-full max-w-7xl mx-auto w-full">
+        <header class="fixed-header shadow-lg">
+            <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <div class="bg-yellow-700 text-slate-900 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl">M</div>
-                    <div><h1 class="text-xl font-bold">MPU3411 OLAHRAGA</h1><p class="text-xs text-slate-400">Pengguna: <span id="user-display-name">...</span> | <span id="user-role-display">...</span></p></div>
+                    <span class="bg-yellow-500 text-slate-900 px-2 py-1 rounded font-black text-sm">V8</span>
+                    <h1 class="font-black text-lg" id="display-user">...</h1>
                 </div>
-                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2"><i class="fas fa-sign-out-alt"></i>KELUAR</button>
+                <button onclick="location.reload()" class="bg-red-500/10 text-red-500 p-2 rounded-xl hover:bg-red-500 hover:text-white transition-all"><i class="fas fa-power-off"></i></button>
             </div>
         </header>
 
-        <div class="fixed top-[70px] left-0 right-0 bg-white z-40 border-b shadow-sm">
-            <nav class="flex px-4 py-2 space-x-2 overflow-x-auto max-w-7xl mx-auto">
-                <button onclick="nav('dashboard')" id="btn-dashboard" class="nav-btn active px-4 py-2 rounded-lg text-sm font-bold bg-blue-100 text-blue-700 transition">Dashboard</button>
-                <button onclick="nav('ujian')" id="btn-ujian" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">Ujian (30%)</button>
-                <button onclick="nav('hp3')" id="btn-hp3" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">Amali HP3 (50%)</button>
-                <button onclick="nav('hp7')" id="btn-hp7" class="nav-btn px-4 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-100 transition">HP7 (20%)</button>
-            </nav>
-        </div>
+        <nav class="fixed top-[70px] left-0 right-0 bg-white/80 backdrop-blur-md border-b z-40 p-2 overflow-x-auto">
+            <div class="max-w-7xl mx-auto flex gap-2">
+                <button onclick="nav('dashboard')" id="btn-dashboard" class="nav-btn px-6 py-2 rounded-xl text-xs font-black bg-blue-50 text-blue-600 uppercase">Dashboard</button>
+                <button onclick="nav('hp3')" id="btn-hp3" class="nav-btn px-6 py-2 rounded-xl text-xs font-black text-slate-500 uppercase">Amali HP3 (50%)</button>
+            </div>
+        </nav>
 
-        <div class="main-content-area max-w-7xl mx-auto px-4">
+        <main class="main-content">
             
-            <section id="dashboard" class="content-section block">
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg mb-6 text-sm flex items-center gap-2">
-                    <i class="fas fa-info-circle"></i> <span>Data untuk kelas: <span id="user-class-badge" class="font-bold underline">...</span></span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white p-5 rounded-xl border shadow-sm"><h3 class="text-xs font-bold text-slate-500 uppercase">Pelajar</h3><p class="text-3xl font-extrabold mt-2" id="dash-total">0</p></div>
-                    <div class="bg-white p-5 rounded-xl border shadow-sm border-blue-100"><h3 class="text-xs font-bold text-blue-600 uppercase">Ujian Selesai</h3><p class="text-3xl font-extrabold text-blue-700 mt-2" id="dash-ujian">0</p></div>
-                    <div class="bg-white p-5 rounded-xl border shadow-sm border-green-100"><h3 class="text-xs font-bold text-green-600 uppercase">HP3 Selesai</h3><p class="text-3xl font-extrabold text-green-700 mt-2" id="dash-hp3">0</p></div>
-                    <div class="bg-white p-5 rounded-xl border shadow-sm border-yellow-100"><h3 class="text-xs font-bold text-yellow-600 uppercase">HP7 Selesai</h3><p class="text-3xl font-extrabold text-yellow-700 mt-2" id="dash-hp7">0</p></div>
-                </div>
-
-                <div id="admin-analytics-area" class="hidden mt-8 mb-8">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="md:col-span-1 bg-white p-6 rounded-xl border shadow-sm border-purple-100">
-                            <h3 class="text-sm font-bold text-purple-600 mb-6 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-chart-bar"></i> Statistik Keseluruhan</h3>
-                            <div class="space-y-6">
-                                <div class="bg-purple-50 p-4 rounded-lg">
-                                    <p class="text-xs text-purple-500 font-bold uppercase mb-1">Min (Mean)</p>
-                                    <p id="stat-mean" class="text-4xl font-black text-slate-800">0.00</p>
-                                </div>
-                                <div class="bg-slate-50 p-4 rounded-lg">
-                                    <p class="text-xs text-slate-500 font-bold uppercase mb-1">Sisihan Piawai (SD)</p>
-                                    <p id="stat-sd" class="text-4xl font-black text-slate-800">0.00</p>
-                                </div>
-                                <p class="text-[10px] text-gray-400 italic font-medium">* Dikira berdasarkan jumlah markah (Ujian+HP3+HP7)</p>
+            <section id="dashboard" class="content-section active">
+                <div id="admin-analytics" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-3xl border shadow-sm border-purple-100 flex flex-col justify-center">
+                        <h3 class="text-xs font-black text-purple-600 uppercase mb-4 tracking-widest">Analisis Keseluruhan</h3>
+                        <div class="space-y-4">
+                            <div class="bg-purple-50 p-4 rounded-2xl text-center">
+                                <p class="text-[10px] font-bold text-purple-400 uppercase">Min Markah (Average)</p>
+                                <p id="stat-mean" class="text-4xl font-black text-slate-800">0.00</p>
                             </div>
-                        </div>
-                        <div class="md:col-span-2 bg-white p-6 rounded-xl border shadow-sm">
-                            <h3 class="text-sm font-bold text-slate-700 mb-4 uppercase flex items-center gap-2"><i class="fas fa-wave-square text-blue-500"></i> Graf Loceng Sisihan Piawai (Normal Distribution)</h3>
-                            <div class="h-[250px] w-full">
-                                <canvas id="bellCurveChart"></canvas>
+                            <div class="bg-slate-50 p-4 rounded-2xl text-center">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">Sisihan Piawai (SD)</p>
+                                <p id="stat-sd" class="text-4xl font-black text-slate-800">0.00</p>
                             </div>
                         </div>
                     </div>
+                    <div class="md:col-span-2 bg-white p-6 rounded-3xl border shadow-sm">
+                        <h3 class="text-xs font-black text-slate-400 uppercase mb-4 tracking-widest">Graf Loceng (Taburan Normal)</h3>
+                        <div class="h-[220px]"><canvas id="bellChart"></canvas></div>
+                    </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
-                        <h3 class="font-bold text-gray-800">Ringkasan Prestasi</h3>
-                        <select id="dash-filter-class" onchange="renderDashboardTable()" class="text-xs p-2 border rounded font-semibold focus:outline-none"></select>
+                <div class="bg-white rounded-3xl border shadow-sm overflow-hidden">
+                    <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
+                        <h3 class="font-black text-sm uppercase tracking-widest text-slate-600">Ringkasan Markah Pelajar</h3>
+                        <select id="filter-class" onchange="renderTable()" class="text-xs font-black border-2 p-2 rounded-xl outline-none focus:border-blue-500"></select>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full styled-table text-sm">
-                            <thead><tr><th>Nama Pelajar</th><th>Kelas</th><th class="text-center">Ujian</th><th class="text-center">HP3</th><th class="text-center">HP7</th><th class="text-center">Jum</th><th class="text-center">Status</th></tr></thead>
-                            <tbody id="dashboard-table-body"><tr><td colspan="7" class="text-center py-4 text-gray-500">Memuatkan data...</td></tr></tbody>
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-900 text-white uppercase font-black tracking-widest">
+                                <tr><th class="p-5">Nama Pelajar</th><th class="p-5 text-center">Ujian</th><th class="p-5 text-center text-green-400">HP3</th><th class="p-5 text-center">HP7</th><th class="p-5 text-center">Jumlah</th><th class="p-5 text-center">Status</th></tr>
+                            </thead>
+                            <tbody id="dash-tbody" class="font-bold text-slate-700"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <section id="ujian" class="content-section">
-                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center"><i class="fas fa-file-alt text-blue-600 mr-2"></i> Ujian (30%)</h2>
-                    <form id="form-ujian" onsubmit="handleFormSubmit(event, 'MARKAH_UJIAN')">
-                        <div class="bg-blue-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-ujian" onchange="filterStudents('ujian')" class="w-full p-2 border rounded bg-white"></select></div>
-                            <div><label class="block text-xs font-bold mb-1">Pelajar</label><input type="text" id="search-student-ujian" onkeyup="searchDropdown('ujian')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-ujian" onchange="loadStudentData('ujian')" class="w-full p-2 border rounded bg-white" disabled></select></div>
-                            <div class="md:col-span-2"><input type="text" id="name-ujian" class="w-full p-2 bg-gray-200 border rounded font-bold text-center" readonly placeholder="Nama Pelajar">
-                            <input type="hidden" name="ID_SISTEM" id="id-ujian"><input type="hidden" name="Nama_Pelajar" id="hidden-name-ujian"><input type="hidden" name="Kelas" id="class-ujian"></div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <div class="bg-white p-4 rounded border shadow-sm text-center"><label class="font-bold text-blue-900 block mb-2 text-sm">BAHAGIAN A (Max 20)</label><input type="number" name="Bahagian_A" class="score-in w-full p-3 border-2 border-blue-200 rounded text-center font-bold text-2xl focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" max="20" placeholder="0"></div>
-                            <div class="bg-white p-4 rounded border shadow-sm text-center"><label class="font-bold text-blue-900 block mb-2 text-sm">BAHAGIAN B (Max 5)</label><input type="number" name="Bahagian_B" class="score-in w-full p-3 border-2 border-blue-200 rounded text-center font-bold text-2xl focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" max="5" placeholder="0"></div>
-                            <div class="bg-white p-4 rounded border shadow-sm text-center"><label class="font-bold text-blue-900 block mb-2 text-sm">BAHAGIAN C (Max 5)</label><input type="number" name="Bahagian_C" class="score-in w-full p-3 border-2 border-blue-200 rounded text-center font-bold text-2xl focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" max="5" placeholder="0"></div>
-                        </div>
-                        <div class="flex justify-between items-center border-t pt-4">
-                            <div class="font-bold text-gray-700">Jumlah: <span id="total-ujian" class="text-blue-600 text-2xl">0</span> / 30</div>
-                            <input type="hidden" name="Jumlah_Ujian" id="val-total-ujian">
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded shadow">SIMPAN</button>
-                        </div>
-                    </form>
-                </div>
-            </section>
-
             <section id="hp3" class="content-section">
-                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
-                    <div class="flex justify-between items-center border-b pb-4 mb-6">
-                        <h2 class="text-2xl font-bold text-slate-800 flex items-center"><i class="fas fa-running text-green-600 mr-2"></i> Amali HP3 (50%)</h2>
-                        <button type="button" onclick="toggleRubric(true)" class="btn-rubric-orange"><i class="fas fa-book-open"></i> PANDUAN RUBRIK</button>
+                <div class="bg-white p-8 rounded-[40px] border shadow-sm max-w-2xl mx-auto">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-xl"><i class="fas fa-running"></i></div>
+                        <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">Amali HP3 (50%)</h2>
                     </div>
-                    <form id="form-hp3" onsubmit="handleFormSubmit(event, 'MARKAH_AMALI_HP3')">
-                        <div class="bg-green-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-hp3" onchange="filterStudents('hp3')" class="w-full p-2 border rounded bg-white"></select></div>
-                            <div><label class="block text-xs font-bold mb-1">Pelajar</label><input type="text" id="search-student-hp3" onkeyup="searchDropdown('hp3')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-hp3" onchange="loadStudentData('hp3')" class="w-full p-2 border rounded bg-white" disabled></select></div>
-                            <div class="md:col-span-2"><input type="text" id="name-hp3" class="w-full p-2 bg-gray-100 border rounded font-bold text-center" readonly placeholder="Nama Pelajar"><input type="hidden" name="ID_SISTEM" id="id-hp3"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp3"><input type="hidden" name="Kelas" id="class-hp3"></div>
+                    
+                    <form id="form-hp3" onsubmit="saveMark(event, 'MARKAH_AMALI_HP3')">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 bg-slate-50 p-4 rounded-3xl border-2 border-dashed">
+                            <div><label class="block text-[10px] font-black uppercase mb-1 text-slate-400 ml-2">Pilih Kelas</label><select id="sel-class-hp3" onchange="filterStu('hp3')" class="w-full p-3 border-2 rounded-2xl font-bold outline-none focus:border-green-500"></select></div>
+                            <div><label class="block text-[10px] font-black uppercase mb-1 text-slate-400 ml-2">Nama Pelajar</label><select id="sel-student-hp3" onchange="loadStu('hp3')" class="w-full p-3 border-2 rounded-2xl font-bold outline-none focus:border-green-500" disabled></select></div>
+                            <div class="col-span-2"><input type="text" id="name-hp3" class="w-full p-4 bg-white border-2 rounded-2xl text-center font-black text-xl text-slate-800" readonly placeholder="SILA PILIH PELAJAR"></div>
                         </div>
-                        <div class="mb-6 border p-4 rounded bg-white">
-                            <h3 class="font-bold text-green-700 mb-3 border-b pb-1">BALAPAN (LARI PECUT)</h3>
-                            <div class="grid grid-cols-3 gap-3">
-                                <div><label class="text-xs block font-bold">Permulaan (10)</label><input type="number" name="HP3_Permulaan_10" class="score-in-hp3 w-full border p-2 text-center rounded font-bold" step="0.01" max="10"></div>
-                                <div><label class="text-xs block font-bold">Larian (10)</label><input type="number" name="HP3_Larian_10" class="score-in-hp3 w-full border p-2 text-center rounded font-bold" step="0.01" max="10"></div>
-                                <div><label class="text-xs block font-bold">Penamat (5)</label><input type="number" name="HP3_Penamat_5" class="score-in-hp3 w-full border p-2 text-center rounded font-bold" step="0.01" max="5"></div>
-                            </div>
-                        </div>
-                        <div class="mb-6 border p-4 rounded bg-white">
-                            <h3 class="font-bold text-green-700 mb-3 border-b pb-1">PADANG (LONTAR PELURU)</h3>
-                            <div class="grid grid-cols-4 gap-3">
-                                <div><label class="text-xs block font-bold">Sedia (5)</label><input type="number" name="HP3_Persediaan_5" class="score-in-hp3 w-full border p-2 text-center rounded font-bold" step="0.01" max="5"></div>
-                                <div><label class="text-xs block font-bold">Lungsur (5)</label><input type="number" name="HP3_Lungsuran_5" class="score-in-hp3 w-full border p-2 text-center rounded font-bold" step="0.01" max="5"></div>
-                                <div><label class="text-xs block font-bold">Lontar (10)</label><input type="number" name="HP3_Lontaran_10" class="score-in-hp3 w-full border p-2 text-center rounded font-bold" step="0.01" max="10"></div>
-                                <div><label class="text-xs block font-bold">Pulih (5)</label><input type="number" name="HP3_Pulihan_5" class="score-in-hp3 w-full border p-2 text-center rounded font-bold" step="0.01" max="5"></div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-hp3" class="text-green-600 text-xl">0</span> / 50</div><input type="hidden" name="Jumlah_HP3" id="val-total-hp3"><button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
-                    </form>
-                </div>
-            </section>
 
-            <section id="hp7" class="content-section">
-                <div class="bg-white p-6 rounded-xl shadow-sm border max-w-4xl mx-auto">
-                    <div class="flex justify-between items-center border-b pb-4 mb-6">
-                        <h2 class="text-2xl font-bold text-slate-800 flex items-center"><i class="fas fa-tools text-yellow-600 mr-2"></i> HP7 (20%)</h2>
-                        <button type="button" onclick="toggleRubricHP7(true)" class="btn-rubric-orange"><i class="fas fa-book-open"></i> PANDUAN RUBRIK</button>
-                    </div>
-                    <form id="form-hp7" onsubmit="handleFormSubmit(event, 'MARKAH_HP7')">
-                        <div class="bg-yellow-50 p-5 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label class="block text-xs font-bold mb-1">Kelas</label><select id="sel-class-hp7" onchange="filterStudents('hp7')" class="w-full p-2 border rounded bg-white"></select></div>
-                            <div><label class="block text-xs font-bold mb-1">Nama Pelajar</label><input type="text" id="search-student-hp7" onkeyup="searchDropdown('hp7')" placeholder="Cari..." class="w-full p-2 border rounded mb-1"><select id="sel-student-hp7" onchange="loadStudentData('hp7')" class="w-full p-2 border rounded bg-white" disabled></select></div>
-                            <div class="md:col-span-2"><input type="text" id="name-hp7" class="w-full p-2 bg-gray-100 border rounded font-bold text-center" readonly placeholder="Nama Pelajar"><input type="hidden" name="ID_SISTEM" id="id-hp7"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp7"><input type="hidden" name="Kelas" id="class-hp7"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="bg-green-50 p-6 rounded-3xl border-2 border-green-100 text-center">
+                                <label class="text-xs font-black text-green-700 block mb-3 uppercase tracking-widest">Jumlah Balapan (25)</label>
+                                <input type="number" name="HP3_Total_Balapan" class="hp3-in w-full p-5 border-2 rounded-2xl text-center font-black text-4xl text-green-900 focus:border-green-500 outline-none" max="25" step="0.01" placeholder="0.0">
+                            </div>
+                            <div class="bg-emerald-50 p-6 rounded-3xl border-2 border-emerald-100 text-center">
+                                <label class="text-xs font-black text-emerald-700 block mb-3 uppercase tracking-widest">Jumlah Padang (25)</label>
+                                <input type="number" name="HP3_Total_Padang" class="hp3-in w-full p-5 border-2 rounded-2xl text-center font-black text-4xl text-emerald-900 focus:border-emerald-500 outline-none" max="25" step="0.01" placeholder="0.0">
+                            </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="p-4 border rounded text-center"><label class="font-bold block mb-2">Penyediaan Trek (10)</label><input type="number" name="HP7_Penyediaan_Trek_10" class="score-in-hp7 w-full border p-3 rounded text-center font-bold text-lg" step="0.01" max="10"></div>
-                            <div class="p-4 border rounded text-center"><label class="font-bold block mb-2">Penyediaan Sektor (10)</label><input type="number" name="HP7_Penyediaan_Sektor_10" class="score-in-hp7 w-full border p-3 rounded text-center font-bold text-lg" step="0.01" max="10"></div>
+
+                        <div class="bg-green-600 p-6 rounded-3xl flex justify-between items-center text-white shadow-xl shadow-green-200">
+                            <div>
+                                <p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Jumlah Terkumpul</p>
+                                <p class="text-5xl font-black"><span id="total-hp3">0.0</span><span class="text-lg opacity-40 ml-1">/ 50</span></p>
+                            </div>
+                            <input type="hidden" name="ID_SISTEM" id="id-hp3">
+                            <input type="hidden" name="Nama_Pelajar" id="hidden-name-hp3">
+                            <input type="hidden" name="Kelas" id="class-hp3">
+                            <input type="hidden" name="Jumlah_HP3" id="val-hp3">
+                            <button type="submit" class="bg-white text-green-700 px-10 py-5 rounded-2xl font-black uppercase hover:scale-105 transition-all shadow-lg">Simpan Markah</button>
                         </div>
-                        <div class="flex justify-between items-center border-t pt-4"><div class="font-bold">Jumlah: <span id="total-hp7" class="text-yellow-600 text-xl">0</span> / 20</div><input type="hidden" name="Jumlah_HP7" id="val-total-hp7"><button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded shadow">SIMPAN</button></div>
                     </form>
                 </div>
             </section>
-        </div>
+        </main>
     </div>
 
     <script>
-        // ============================================
-        // WEB APP URL
-        // ============================================
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJSoyfmId5JUQDgwqVE-6aMBLYLbQv6i5N5y7bC5SajqSjHPzt8UJUqbZ8a-LBTyd1/exec";
+        // URL WEB APP (Pastikan ini satu baris saja)
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzzPGC7b5AooO1rehHawk7VSlX2k5C_KZrqQKu-B0OKprNjONDOVLLBeqWrtHgzZNOh/exec";
+        
+        let currentUser = null, allStudents = [], existingScores = {}, bellChartInstance = null;
 
-        let currentUser = null;
-        let allStudents = [];
-        let existingScores = {};
-        let filteredStudentsCache = [];
-        let bellChart = null; // Globals for chart instance
-
-        function normalizeData(students) {
-            return students.map(s => {
-                const kelas = s.Kelas || s.KELAS || s.kelas || "TIADA KELAS";
-                const nama = s.Nama_Pelajar || s.NAMA_PELAJAR || s.Nama || "TIADA NAMA";
-                const id = s.ID_SISTEM || s.ID || s.id_sistem || "";
-                return { ...s, Kelas: kelas.toString().trim(), Nama_Pelajar: nama, ID_SISTEM: id };
-            });
-        }
-
-        function cleanNumber(val) {
-            if (val === "#N/A" || val === "" || val === null || val === undefined) return 0;
-            const num = parseFloat(val);
-            return isNaN(num) ? 0 : num;
-        }
-
-        function toggleRubric(show) { document.getElementById('rubric-modal').classList.toggle('hidden', !show); }
-        function toggleRubricHP7(show) { document.getElementById('rubric-hp7-modal').classList.toggle('hidden', !show); }
-        function switchRubricTab(tabName) {
-            document.getElementById('rubric-content-balapan').classList.toggle('hidden', tabName !== 'balapan');
-            document.getElementById('rubric-content-padang').classList.toggle('hidden', tabName !== 'padang');
+        // UI Functions
+        function showLoader(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
+        
+        function showToast(m, color='#10b981') {
+            const el = document.getElementById('toast');
+            el.innerText = m; el.style.backgroundColor = color; el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
         }
 
         function nav(id) {
-            document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
-            document.getElementById(id).style.display = 'block';
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-100', 'text-blue-700', 'active'));
-            document.getElementById(`btn-${id}`).classList.add('bg-blue-100', 'text-blue-700', 'active');
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('bg-blue-50', 'text-blue-600');
+                b.classList.add('text-slate-500');
+            });
+            document.getElementById(`btn-${id}`).classList.replace('text-slate-500', 'bg-blue-50');
+            document.getElementById(`btn-${id}`).classList.add('text-blue-600');
         }
 
-        function showToast(msg, type='success') {
-            const t = document.createElement('div'); t.className = `toast ${type}`;
-            t.innerHTML = `<span>${msg}</span>`; document.getElementById('toast-container').appendChild(t);
-            requestAnimationFrame(() => t.classList.add('show')); setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300) }, 3000);
-        }
-
-        function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
-
+        // 1. LOGIN HANDLER
         document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault(); showLoader(true);
-            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email: document.getElementById('email').value.trim(), password: document.getElementById('password').value.trim() }) })
-            .then(res => res.json()).then(data => {
-                if (data.result === 'success') { 
-                    currentUser = { ...data.user, role: data.user.role.toUpperCase(), kelas: (data.user.kelas || "ALL").toString().trim() }; 
-                    initApp(); 
-                } else { showToast(data.message, 'error'); showLoader(false); }
-            }).catch(() => { showToast("Ralat sambungan", 'error'); showLoader(false); });
+            e.preventDefault();
+            showLoader(true);
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'login', email, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.result === 'success') {
+                    currentUser = data.user;
+                    initApp();
+                } else {
+                    showLoader(false);
+                    showToast(data.message, '#ef4444');
+                }
+            })
+            .catch(err => {
+                showLoader(false);
+                showToast("Ralat Sambungan: Pastikan URL dideploy sebagai 'Anyone'.", "#ef4444");
+            });
         });
 
+        // 2. DATA INITIALIZATION
         function initApp() {
             document.getElementById('login-view').style.display = 'none';
             document.getElementById('app-container').classList.remove('hidden');
-            document.getElementById('user-display-name').innerText = currentUser.nama;
-            document.getElementById('user-role-display').innerText = currentUser.role;
-            document.getElementById('user-class-badge').innerText = currentUser.kelas;
-            nav('dashboard');
+            document.getElementById('display-user').innerText = `${currentUser.nama} (${currentUser.role})`;
             
-            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'get_data', email: currentUser.email, role: currentUser.role.toLowerCase() }) })
-            .then(res => res.json()).then(data => {
-                if(data.result === 'success'){
-                    allStudents = normalizeData(data.data.students); 
-                    existingScores = data.data.scores;
-                    updateDashboard(); 
-                    initDropdowns('ujian'); initDropdowns('hp3'); initDropdowns('hp7');
-                } else { showToast(data.message, 'error'); }
+            fetch(WEB_APP_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'get_data', email: currentUser.email, role: currentUser.role }) 
+            })
+            .then(res => res.json())
+            .then(d => {
+                allStudents = d.data.students;
+                existingScores = d.data.scores;
+                initDropdowns('hp3');
+                updateDashboard();
                 showLoader(false);
             });
         }
 
-        function logout() { if(confirm("Log keluar?")) location.reload(); }
-
         function initDropdowns(suffix) {
             const sel = document.getElementById(`sel-class-${suffix}`);
-            sel.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-            let classesToShow = new Set(allStudents.map(s => s.Kelas));
-            if (currentUser.role !== 'ADMIN' && currentUser.kelas && currentUser.kelas !== 'ALL') {
-                sel.innerHTML = `<option value="${currentUser.kelas}">${currentUser.kelas}</option>`;
-                sel.value = currentUser.kelas; filterStudents(suffix);
-            } else {
-                Array.from(classesToShow).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
-            }
+            const classes = [...new Set(allStudents.map(p => p.Kelas))].sort();
+            sel.innerHTML = '<option value="">-- KELAS --</option>';
+            classes.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
         }
 
-        function filterStudents(suffix) {
+        function filterStu(suffix) {
             const cls = document.getElementById(`sel-class-${suffix}`).value;
-            const studentSel = document.getElementById(`sel-student-${suffix}`);
-            studentSel.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
-            const searchInput = document.getElementById(`search-student-${suffix}`);
-            if (searchInput) searchInput.value = '';
-            if(!cls) { studentSel.disabled = true; filteredStudentsCache = []; return; }
-            studentSel.disabled = false;
-            filteredStudentsCache = allStudents.filter(s => s.Kelas === cls);
-            populateStudentDropdown(suffix, filteredStudentsCache);
-        }
-
-        function populateStudentDropdown(suffix, students) {
-            const studentSel = document.getElementById(`sel-student-${suffix}`);
-            studentSel.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
-            students.forEach(s => {
-                const mark = checkDone(suffix, s.ID_SISTEM) ? '✅ ' : '';
-                studentSel.innerHTML += `<option value="${s.ID_SISTEM}">${mark}${s.Nama_Pelajar}</option>`;
+            const stu = document.getElementById(`sel-student-${suffix}`);
+            stu.innerHTML = '<option value="">-- PELAJAR --</option>';
+            if(!cls) { stu.disabled = true; return; }
+            stu.disabled = false;
+            allStudents.filter(p => p.Kelas === cls).forEach(p => {
+                const sheet = suffix === 'hp3' ? 'MARKAH_AMALI_HP3' : '';
+                const icon = existingScores[sheet]?.[p.ID_SISTEM] ? '✅ ' : '';
+                stu.innerHTML += `<option value="${p.ID_SISTEM}">${icon}${p.Nama_Pelajar}</option>`;
             });
         }
 
-        function searchDropdown(suffix) {
-            const query = document.getElementById(`search-student-${suffix}`).value.toLowerCase();
-            const filtered = filteredStudentsCache.filter(s => s.Nama_Pelajar.toLowerCase().includes(query));
-            populateStudentDropdown(suffix, filtered);
-        }
-
-        function checkDone(suffix, id) {
-            let sheet = suffix === 'ujian' ? 'MARKAH_UJIAN' : suffix === 'hp3' ? 'MARKAH_AMALI_HP3' : 'MARKAH_HP7';
-            return existingScores[sheet] && existingScores[sheet][id];
-        }
-
-        function loadStudentData(suffix) {
+        function loadStu(suffix) {
             const id = document.getElementById(`sel-student-${suffix}`).value;
-            if (!id) return;
-            const student = allStudents.find(s => s.ID_SISTEM == id);
-            if (student) {
-                document.getElementById(`name-${suffix}`).value = student.Nama_Pelajar;
-                document.getElementById(`hidden-name-${suffix}`).value = student.Nama_Pelajar;
-                document.getElementById(`id-${suffix}`).value = student.ID_SISTEM;
-                document.getElementById(`class-${suffix}`).value = student.Kelas;
-                let sheetKey = suffix === 'ujian' ? 'MARKAH_UJIAN' : suffix === 'hp3' ? 'MARKAH_AMALI_HP3' : 'MARKAH_HP7';
-                document.querySelectorAll(`#form-${suffix} input[type=number]`).forEach(i => { i.value = ''; i.classList.remove('border-red-500'); });
-                calculateTotal(suffix);
-                if (existingScores[sheetKey] && existingScores[sheetKey][id]) {
-                    const d = existingScores[sheetKey][id];
-                    const form = document.getElementById(`form-${suffix}`);
-                    if (suffix === 'ujian') { fill(form, 'Bahagian_A', d[5]); fill(form, 'Bahagian_B', d[6]); fill(form, 'Bahagian_C', d[7]); } 
-                    else if (suffix === 'hp3') { fill(form, 'HP3_Permulaan_10', d[5]); fill(form, 'HP3_Larian_10', d[6]); fill(form, 'HP3_Penamat_5', d[7]); fill(form, 'HP3_Persediaan_5', d[8]); fill(form, 'HP3_Lungsuran_5', d[9]); fill(form, 'HP3_Lontaran_10', d[10]); fill(form, 'HP3_Pulihan_5', d[11]); }
-                    else if (suffix === 'hp7') { fill(form, 'HP7_Penyediaan_Trek_10', d[5]); fill(form, 'HP7_Penyediaan_Sektor_10', d[6]); }
-                    calculateTotal(suffix); showToast("Markah dimuatkan.", "success");
+            if(!id) return;
+            const p = allStudents.find(x => x.ID_SISTEM == id);
+            document.getElementById(`name-${suffix}`).value = p.Nama_Pelajar;
+            document.getElementById(`id-${suffix}`).value = p.ID_SISTEM;
+            document.getElementById(`class-${suffix}`).value = p.Kelas;
+            document.getElementById(`hidden-name-${suffix}`).value = p.Nama_Pelajar;
+            
+            const form = document.getElementById(`form-${suffix}`);
+            form.querySelectorAll('input[type=number]').forEach(i => i.value = '');
+            
+            const sheet = suffix === 'hp3' ? 'MARKAH_AMALI_HP3' : '';
+            if(existingScores[sheet]?.[id]) {
+                const d = existingScores[sheet][id];
+                if(suffix === 'hp3') {
+                    form.querySelector('[name=HP3_Total_Balapan]').value = d[5];
+                    form.querySelector('[name=HP3_Total_Padang]').value = d[6];
                 }
+                showToast("Markah dimuatkan.");
             }
+            calculateHP3Total();
         }
 
-        function fill(form, name, val) { const inp = form.querySelector(`[name="${name}"]`); if(inp) inp.value = val; }
-
-        document.querySelectorAll('.score-in, .score-in-hp3, .score-in-hp7').forEach(i => {
-            i.addEventListener('input', function() {
-                let suffix = this.classList.contains('score-in') ? 'ujian' : this.classList.contains('score-in-hp3') ? 'hp3' : 'hp7';
-                calculateTotal(suffix);
-            });
+        // 3. CALCULATION LOGIC
+        document.querySelectorAll('.hp3-in').forEach(input => {
+            input.addEventListener('input', calculateHP3Total);
         });
 
-        function calculateTotal(suffix) {
-            let total = 0; let cls = suffix === 'ujian' ? '.score-in' : suffix === 'hp3' ? '.score-in-hp3' : '.score-in-hp7';
-            document.querySelectorAll(`#form-${suffix} ${cls}`).forEach(inp => {
-                let v = parseFloat(inp.value) || 0; let max = parseFloat(inp.getAttribute('max') || 100);
-                if(v > max) { inp.value = max; v = max; }
+        function calculateHP3Total() {
+            let total = 0;
+            document.querySelectorAll('.hp3-in').forEach(i => {
+                let v = parseFloat(i.value) || 0;
+                if(v > 25) { i.value = 25; v = 25; }
                 total += v;
             });
-            document.getElementById(`total-${suffix}`).innerText = total.toFixed(1);
-            document.getElementById(`val-total-${suffix}`).value = total.toFixed(1);
+            document.getElementById('total-hp3').innerText = total.toFixed(1);
+            document.getElementById('val-hp3').value = total.toFixed(1);
         }
 
-        function handleFormSubmit(e, sheetName) {
-            e.preventDefault(); if (!confirm("Simpan?")) return; showLoader(true);
-            const formData = new FormData(e.target); const dataObj = {}; formData.forEach((value, key) => dataObj[key] = value);
-            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'save_mark', sheetName: sheetName, userEmail: currentUser.email, role: currentUser.role.toLowerCase(), formData: dataObj }) })
-            .then(res => res.json()).then(res => {
-                if (res.result === 'success') { showToast("Disimpan!", 'success'); initApp(); } 
-                else { showToast(res.message, 'error'); showLoader(false); }
-            }).catch(() => { showToast("Ralat rangkaian", 'error'); showLoader(false); });
-        }
-
-        function updateDashboard() {
-            let targetStudents = allStudents;
-            const assignedClass = currentUser.kelas;
-            if (currentUser.role === 'PENSYARAH' || (assignedClass && assignedClass !== 'ALL')) {
-                targetStudents = allStudents.filter(s => s.Kelas === assignedClass);
-            }
-            document.getElementById('dash-total').innerText = targetStudents.length;
-            let cU=0, cHP3=0, cHP7=0;
-            targetStudents.forEach(s => {
-                if (existingScores['MARKAH_UJIAN'] && existingScores['MARKAH_UJIAN'][s.ID_SISTEM]) cU++;
-                if (existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][s.ID_SISTEM]) cHP3++;
-                if (existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][s.ID_SISTEM]) cHP7++;
-            });
-            document.getElementById('dash-ujian').innerText = cU;
-            document.getElementById('dash-hp3').innerText = cHP3;
-            document.getElementById('dash-hp7').innerText = cHP7;
+        // 4. SUBMIT MARK
+        function saveMark(e, sheetName) {
+            e.preventDefault();
+            if(!confirm("Hantar markah ke pangkalan data?")) return;
+            showLoader(true);
+            const formData = {};
+            new FormData(e.target).forEach((v, k) => formData[k] = v);
             
-            const filterSel = document.getElementById('dash-filter-class');
-            filterSel.innerHTML = '';
-            if (currentUser.role === 'ADMIN' || assignedClass === 'ALL') {
-                 filterSel.innerHTML = '<option value="all">Semua Kelas</option>';
-                 const classSet = new Set(allStudents.map(s => s.Kelas));
-                 Array.from(classSet).sort().forEach(c => filterSel.innerHTML += `<option value="${c}">${c}</option>`);
-            } else {
-                filterSel.innerHTML = `<option value="${assignedClass}">${assignedClass}</option>`;
-                filterSel.disabled = true;
-            }
-            renderDashboardTable();
-
-            // KAWALAN PAPARAN ADMIN ANALYTICS
-            if(currentUser.role === 'ADMIN') {
-                document.getElementById('admin-analytics-area').classList.remove('hidden');
-                calculateAdminStats();
-            } else {
-                document.getElementById('admin-analytics-area').classList.add('hidden');
-            }
-        }
-
-        function renderDashboardTable() {
-            const tbody = document.getElementById('dashboard-table-body');
-            let filterClass = document.getElementById('dash-filter-class').value;
-            tbody.innerHTML = '';
-            let studentsToRender = (filterClass !== 'all') ? allStudents.filter(s => s.Kelas === filterClass) : allStudents;
-            if(studentsToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4">Tiada data.</td></tr>'; return; }
-
-            studentsToRender.forEach(s => {
-                const id = s.ID_SISTEM;
-                const sU = existingScores['MARKAH_UJIAN'] && existingScores['MARKAH_UJIAN'][id];
-                const sH3 = existingScores['MARKAH_AMALI_HP3'] && existingScores['MARKAH_AMALI_HP3'][id];
-                const sH7 = existingScores['MARKAH_HP7'] && existingScores['MARKAH_HP7'][id];
-
-                const valUjian = sU ? (cleanNumber(sU[5]) + cleanNumber(sU[6]) + cleanNumber(sU[7])).toFixed(1) : '-';
-                const valHP3 = sH3 ? [5,6,7,8,9,10,11].reduce((acc, idx) => acc + cleanNumber(sH3[idx]), 0).toFixed(1) : '-';
-                const valHP7 = sH7 ? (cleanNumber(sH7[5]) + cleanNumber(sH7[6])).toFixed(1) : '-';
-                
-                let total = 0;
-                if(valUjian !== '-') total += parseFloat(valUjian);
-                if(valHP3 !== '-') total += parseFloat(valHP3);
-                if(valHP7 !== '-') total += parseFloat(valHP7);
-                
-                const isComplete = (valUjian !== '-' && valHP3 !== '-' && valHP7 !== '-');
-                const status = isComplete ? '<span class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold">Lengkap</span>' : '<span class="px-2 py-1 rounded bg-gray-100 text-gray-500 text-xs font-bold">Proses</span>';
-
-                tbody.innerHTML += `<tr><td class="font-bold">${s.Nama_Pelajar}</td><td>${s.Kelas}</td><td class="text-center">${valUjian}</td><td class="text-center">${valHP3}</td><td class="text-center">${valHP7}</td><td class="text-center font-bold text-blue-600">${total > 0 ? total.toFixed(1) : '-'}</td><td class="text-center">${status}</td></tr>`;
-            });
-        }
-
-        // ============================================
-        // ADMIN ANALYTICS LOGIC (BARU)
-        // ============================================
-        function calculateAdminStats() {
-            const allTotals = [];
-            allStudents.forEach(s => {
-                const id = s.ID_SISTEM;
-                const sU = existingScores['MARKAH_UJIAN']?.[id];
-                const sH3 = existingScores['MARKAH_AMALI_HP3']?.[id];
-                const sH7 = existingScores['MARKAH_HP7']?.[id];
-
-                if (sU || sH3 || sH7) {
-                    let sum = 0;
-                    if(sU) sum += (cleanNumber(sU[5]) + cleanNumber(sU[6]) + cleanNumber(sU[7]));
-                    if(sH3) sum += [5,6,7,8,9,10,11].reduce((acc, idx) => acc + cleanNumber(sH3[idx]), 0);
-                    if(sH7) sum += (cleanNumber(sH7[5]) + cleanNumber(sH7[6]));
-                    allTotals.push(sum);
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    action: 'save_mark', 
+                    sheetName, 
+                    userEmail: currentUser.email, 
+                    role: currentUser.role, 
+                    formData 
+                })
+            })
+            .then(res => res.json())
+            .then(r => {
+                if(r.result === 'success') {
+                    showToast("Markah Berjaya Disimpan!");
+                    initApp(); // Refresh data
+                } else {
+                    showLoader(false);
+                    showToast(r.message, '#ef4444');
                 }
             });
+        }
 
-            if (allTotals.length === 0) return;
+        // 5. ANALYTICS & DASHBOARD
+        function updateDashboard() {
+            if(currentUser.role === 'ADMIN') {
+                document.getElementById('admin-analytics').classList.remove('hidden');
+                calculateStats();
+            }
+            const fSel = document.getElementById('filter-class');
+            fSel.innerHTML = '<option value="all">SEMUA KELAS</option>';
+            [...new Set(allStudents.map(p => p.Kelas))].sort().forEach(c => fSel.innerHTML += `<option value="${c}">${c}</option>`);
+            renderTable();
+        }
 
-            // 1. Kira Min
-            const mean = allTotals.reduce((a, b) => a + b, 0) / allTotals.length;
+        function renderTable() {
+            const tbody = document.getElementById('dash-tbody');
+            const filter = document.getElementById('filter-class').value;
+            tbody.innerHTML = '';
             
-            // 2. Kira Sisihan Piawai (Standard Deviation)
-            const variance = allTotals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / allTotals.length;
+            allStudents.filter(p => filter === 'all' || p.Kelas === filter).forEach(p => {
+                const id = p.ID_SISTEM;
+                const mU = existingScores.MARKAH_UJIAN?.[id];
+                const mH3 = existingScores.MARKAH_AMALI_HP3?.[id];
+                const mH7 = existingScores.MARKAH_HP7?.[id];
+                
+                const valU = mU ? parseFloat(mU[8]) || 0 : 0;
+                const valH3 = mH3 ? parseFloat(mH3[7]) || 0 : 0;
+                const valH7 = mH7 ? parseFloat(mH7[7]) || 0 : 0;
+                const total = valU + valH3 + valH7;
+                
+                const isComplete = (mU && mH3 && mH7);
+
+                tbody.innerHTML += `<tr class="border-b hover:bg-slate-50 transition-all">
+                    <td class="p-5"><div>${p.Nama_Pelajar}</div><div class="text-[9px] opacity-40 uppercase">${p.Kelas}</div></td>
+                    <td class="p-5 text-center">${valU || '-'}</td>
+                    <td class="p-5 text-center text-green-600 font-black">${valH3 || '-'}</td>
+                    <td class="p-5 text-center">${valH7 || '-'}</td>
+                    <td class="p-5 text-center font-black text-blue-600 bg-blue-50/50">${total > 0 ? total.toFixed(1) : '-'}</td>
+                    <td class="p-5 text-center">${isComplete ? '<span class="text-green-500">✅</span>' : '<span class="text-slate-300">⏳</span>'}</td>
+                </tr>`;
+            });
+        }
+
+        function calculateStats() {
+            const totals = [];
+            allStudents.forEach(p => {
+                const id = p.ID_SISTEM;
+                const u = parseFloat(existingScores.MARKAH_UJIAN?.[id]?.[8]) || 0;
+                const h3 = parseFloat(existingScores.MARKAH_AMALI_HP3?.[id]?.[7]) || 0;
+                const h7 = parseFloat(existingScores.MARKAH_HP7?.[id]?.[7]) || 0;
+                if(u + h3 + h7 > 0) totals.push(u + h3 + h7);
+            });
+
+            if(totals.length === 0) return;
+
+            const mean = totals.reduce((a, b) => a + b, 0) / totals.length;
+            const variance = totals.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / totals.length;
             const sd = Math.sqrt(variance);
 
             document.getElementById('stat-mean').innerText = mean.toFixed(2);
             document.getElementById('stat-sd').innerText = sd.toFixed(2);
-
             renderBellCurve(mean, sd);
         }
 
         function renderBellCurve(mean, sd) {
-            const ctx = document.getElementById('bellCurveChart').getContext('2d');
-            
-            // Generate data points for normal distribution
-            const labels = [];
-            const dataPoints = [];
-            
-            // We plot from -4 to +4 standard deviations
-            const start = mean - (4 * sd);
-            const end = mean + (4 * sd);
-            const step = (end - start) / 50;
+            const ctx = document.getElementById('bellChart').getContext('2d');
+            const labels = [], data = [];
+            if(sd === 0) sd = 0.1;
 
-            for (let x = start; x <= end; x += step) {
+            for(let x = mean - (4 * sd); x <= mean + (4 * sd); x += (8 * sd) / 50) {
                 labels.push(x.toFixed(1));
-                // Normal Distribution Formula
-                const exponent = -Math.pow(x - mean, 2) / (2 * Math.pow(sd, 2));
-                const y = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.pow(Math.E, exponent);
-                dataPoints.push(y);
+                const y = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mean) / sd, 2));
+                data.push(y);
             }
 
-            if(bellChart) bellChart.destroy(); // Clear old chart
-
-            bellChart = new Chart(ctx, {
+            if(bellChartInstance) bellChartInstance.destroy();
+            bellChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels,
                     datasets: [{
-                        label: 'Kepadatan Taburan Normal',
-                        data: dataPoints,
-                        borderColor: '#8b5cf6', // purple-500
+                        data,
+                        borderColor: '#8b5cf6',
                         backgroundColor: 'rgba(139, 92, 246, 0.1)',
                         fill: true,
                         tension: 0.4,
@@ -567,17 +396,8 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    },
-                    scales: {
-                        x: { 
-                            title: { display: true, text: 'Markah Keseluruhan', font: { size: 10 } },
-                            ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { size: 9 } }
-                        },
-                        y: { display: false }
-                    }
+                    plugins: { legend: { display: false } },
+                    scales: { y: { display: false }, x: { ticks: { font: { size: 8 } } } }
                 }
             });
         }
