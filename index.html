@@ -1,379 +1,95 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem MPU3411 Pro V8 - Full Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .fixed-header { z-index: 50; top: 0; left: 0; right: 0; height: 70px; }
-        .main-content-area { padding-top: 130px; padding-bottom: 40px; min-height: 100vh; }
-        .content-section { display: none; animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.9); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; }
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 200; }
-        .toast { min-width: 250px; padding: 15px; border-radius: 10px; color: white; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transform: translateX(120%); transition: transform 0.3s ease; }
-        .toast.show { transform: translateX(0); }
-        .toast.success { background: #10b981; }
-        .toast.error { background: #ef4444; }
-        .login-bg { background: radial-gradient(circle at top right, #1e293b, #0f172a); }
-        .styled-table thead tr { background: #1e293b; color: #fff; }
-        .styled-table th, .styled-table td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        .active-section { display: block !important; }
     </style>
 </head>
-<body class="text-gray-800">
+<body>
 
-    <div id="loader" class="loading-overlay">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-2"></div>
-        <p class="font-bold text-gray-600">Sila tunggu...</p>
+<div id="loader" class="loading-overlay">
+    <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mb-2"></div>
+    <p>Menghubungi Server Google...</p>
+</div>
+
+<div id="login-view" class="flex min-h-screen items-center justify-center p-6">
+    <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl text-slate-800">
+        <h2 class="text-2xl font-black text-center mb-6">LOG MASUK MPU3411</h2>
+        <form id="login-form" class="space-y-4">
+            <input type="email" id="email" placeholder="Emel" class="w-full p-3 border rounded-xl" required>
+            <input type="password" id="password" placeholder="Kata Laluan" class="w-full p-3 border rounded-xl" required>
+            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl">MASUK</button>
+        </form>
     </div>
-    <div id="toast-container"></div>
+</div>
 
-    <div id="login-view" class="fixed inset-0 login-bg z-[60] flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-8 border-yellow-500">
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-50 text-blue-600 mb-4"><i class="fas fa-user-shield text-4xl"></i></div>
-                <h1 class="text-2xl font-black text-slate-800 tracking-tight">MPU3411 OLAHRAGA</h1>
-                <p class="text-slate-400 font-bold text-xs uppercase mt-1">Sistem Pengurusan Markah</p>
+<div id="app-container" class="hidden p-4">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-2xl text-slate-800 shadow-xl">
+        <h2 class="text-xl font-bold border-b pb-2 mb-4">AMALI HP3 (VERSI RINGKAS)</h2>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="p-4 bg-green-50 rounded-xl border border-green-200">
+                <label class="block text-xs font-bold mb-2">BALAPAN (25)</label>
+                <input type="number" id="balapan-in" class="w-full p-2 border rounded text-center text-xl font-bold" max="25">
             </div>
-            <form id="login-form" class="space-y-4">
-                <div><label class="block text-xs font-black text-slate-700 uppercase mb-1">Emel Rasmi</label><input type="email" id="email" class="w-full p-3 border-2 rounded-xl focus:border-blue-500 outline-none transition-all" required></div>
-                <div><label class="block text-xs font-black text-slate-700 uppercase mb-1">Kata Laluan</label><input type="password" id="password" class="w-full p-3 border-2 rounded-xl focus:border-blue-500 outline-none transition-all" required></div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transition-all">LOG MASUK</button>
-            </form>
+            <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                <label class="block text-xs font-bold mb-2">PADANG (25)</label>
+                <input type="number" id="padang-in" class="w-full p-2 border rounded text-center text-xl font-bold" max="25">
+            </div>
         </div>
+        <p class="text-2xl font-black text-center mb-4">JUMLAH: <span id="total-hp3">0.0</span> / 50</p>
+        <button class="w-full bg-green-600 text-white font-bold py-3 rounded-xl">SIMPAN MARKAH</button>
     </div>
+</div>
 
-    <div id="app-container" class="hidden">
-        <header class="fixed-header bg-slate-900 text-white shadow-2xl flex items-center px-6">
-            <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <div class="bg-yellow-500 text-slate-900 px-3 py-1 rounded-lg font-black text-xl">M</div>
-                    <div><h1 class="text-lg font-black tracking-tight leading-none">MPU3411</h1><p class="text-[10px] text-slate-400 font-bold" id="user-info">...</p></div>
-                </div>
-                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors"><i class="fas fa-power-off"></i></button>
-            </div>
-        </header>
+<script>
+    // MASUKKAN URL /EXEC ANDA DI SINI
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJSoyfmId5JUQDgwqVE-6aMBLYLbQv6i5N5y7bC5SajqSjHPzt8UJUqbZ8a-LBTyd1/exec";
 
-        <nav class="fixed top-[70px] left-0 right-0 bg-white border-b z-40">
-            <div class="max-w-7xl mx-auto flex overflow-x-auto p-2 gap-2">
-                <button onclick="nav('dashboard')" id="btn-dashboard" class="nav-btn active px-5 py-2 rounded-xl text-sm font-black transition-all bg-blue-50 text-blue-600">Dashboard</button>
-                <button onclick="nav('ujian')" id="btn-ujian" class="nav-btn px-5 py-2 rounded-xl text-sm font-black text-slate-500">Ujian (30%)</button>
-                <button onclick="nav('hp3')" id="btn-hp3" class="nav-btn px-5 py-2 rounded-xl text-sm font-black text-slate-500">Amali HP3 (50%)</button>
-                <button onclick="nav('hp7')" id="btn-hp7" class="nav-btn px-5 py-2 rounded-xl text-sm font-black text-slate-500">HP7 (20%)</button>
-            </div>
-        </nav>
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        document.getElementById('loader').style.display = 'flex';
+        
+        const payload = {
+            action: 'login',
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+        };
 
-        <main class="main-content-area max-w-7xl mx-auto px-4">
-            
-            <section id="dashboard" class="content-section block">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-white p-5 rounded-2xl border shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase">Pelajar</p><p id="dash-total" class="text-3xl font-black">0</p></div>
-                    <div class="bg-white p-5 rounded-2xl border shadow-sm"><p class="text-[10px] font-black text-blue-400 uppercase">Ujian</p><p id="dash-ujian" class="text-3xl font-black text-blue-600">0</p></div>
-                    <div class="bg-white p-5 rounded-2xl border shadow-sm"><p class="text-[10px] font-black text-green-400 uppercase">HP3</p><p id="dash-hp3" class="text-3xl font-black text-green-600">0</p></div>
-                    <div class="bg-white p-5 rounded-2xl border shadow-sm"><p class="text-[10px] font-black text-yellow-400 uppercase">HP7</p><p id="dash-hp7" class="text-3xl font-black text-yellow-600">0</p></div>
-                </div>
-
-                <div id="admin-analytics-area" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-2xl border shadow-sm flex flex-col justify-center gap-4 border-purple-100">
-                        <h3 class="text-xs font-black text-purple-600 uppercase">Analisis Markah Keseluruhan</h3>
-                        <div class="bg-purple-50 p-4 rounded-xl text-center">
-                            <p class="text-[10px] font-bold text-purple-400 uppercase">Min (Average)</p>
-                            <p id="stat-mean" class="text-4xl font-black text-slate-800">0.00</p>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl text-center">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Sisihan Piawai (SD)</p>
-                            <p id="stat-sd" class="text-4xl font-black text-slate-800">0.00</p>
-                        </div>
-                    </div>
-                    <div class="md:col-span-2 bg-white p-6 rounded-2xl border shadow-sm">
-                        <h3 class="text-xs font-black text-slate-500 uppercase mb-4">Graf Loceng (Taburan Normal)</h3>
-                        <div class="h-[200px]"><canvas id="bellCurveChart"></canvas></div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
-                    <div class="p-4 bg-slate-50 border-b flex justify-between items-center"><h3 class="font-black text-sm uppercase">Ringkasan Markah</h3><select id="dash-filter-class" onchange="renderDashboardTable()" class="text-xs font-bold p-2 border rounded-lg"></select></div>
-                    <div class="overflow-x-auto"><table class="w-full styled-table text-xs"><thead><tr><th>Nama Pelajar</th><th>Kelas</th><th class="text-center">Ujian</th><th class="text-center">HP3</th><th class="text-center">HP7</th><th class="text-center">Jum</th><th class="text-center">Status</th></tr></thead><tbody id="dashboard-table-body"></tbody></table></div>
-                </div>
-            </section>
-
-            <section id="ujian" class="content-section">
-                <div class="bg-white p-6 rounded-2xl border shadow-sm max-w-2xl mx-auto">
-                    <h2 class="text-xl font-black mb-6 flex items-center gap-2 text-blue-600"><i class="fas fa-file-invoice"></i> INPUT UJIAN (30%)</h2>
-                    <form id="form-ujian" onsubmit="handleFormSubmit(event, 'MARKAH_UJIAN')">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-slate-50 p-4 rounded-xl">
-                            <div><label class="block text-[10px] font-black uppercase mb-1">Kelas</label><select id="sel-class-ujian" onchange="filterStudents('ujian')" class="w-full p-2 border rounded-lg font-bold"></select></div>
-                            <div><label class="block text-[10px] font-black uppercase mb-1">Pelajar</label><select id="sel-student-ujian" onchange="loadStudentData('ujian')" class="w-full p-2 border rounded-lg font-bold" disabled></select></div>
-                            <div class="md:col-span-2"><input type="text" id="name-ujian" class="w-full p-3 bg-white border-2 rounded-xl font-black text-center" readonly placeholder="NAMA PELAJAR"></div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-4 mb-6">
-                            <div class="text-center"><label class="text-[10px] font-black uppercase block mb-1">Bah A (20)</label><input type="number" name="Bahagian_A" class="score-in w-full p-3 border-2 rounded-xl text-center font-black text-xl" max="20" step="0.01"></div>
-                            <div class="text-center"><label class="text-[10px] font-black uppercase block mb-1">Bah B (5)</label><input type="number" name="Bahagian_B" class="score-in w-full p-3 border-2 rounded-xl text-center font-black text-xl" max="5" step="0.01"></div>
-                            <div class="text-center"><label class="text-[10px] font-black uppercase block mb-1">Bah C (5)</label><input type="number" name="Bahagian_C" class="score-in w-full p-3 border-2 rounded-xl text-center font-black text-xl" max="5" step="0.01"></div>
-                        </div>
-                        <div class="flex justify-between items-center bg-blue-50 p-4 rounded-xl">
-                            <p class="font-black text-blue-800">Jumlah: <span id="total-ujian" class="text-2xl">0</span></p>
-                            <input type="hidden" name="ID_SISTEM" id="id-ujian"><input type="hidden" name="Nama_Pelajar" id="hidden-name-ujian"><input type="hidden" name="Kelas" id="class-ujian"><input type="hidden" name="Jumlah_Ujian" id="val-total-ujian">
-                            <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-black shadow-lg">SIMPAN</button>
-                        </div>
-                    </form>
-                </div>
-            </section>
-
-            <section id="hp3" class="content-section">
-                <div class="bg-white p-6 rounded-2xl border shadow-sm max-w-2xl mx-auto">
-                    <h2 class="text-xl font-black mb-6 flex items-center gap-2 text-green-600"><i class="fas fa-running"></i> AMALI HP3 (50%)</h2>
-                    <form id="form-hp3" onsubmit="handleFormSubmit(event, 'MARKAH_AMALI_HP3')">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-slate-50 p-4 rounded-xl">
-                            <div><label class="block text-[10px] font-black uppercase mb-1">Kelas</label><select id="sel-class-hp3" onchange="filterStudents('hp3')" class="w-full p-2 border rounded-lg font-bold"></select></div>
-                            <div><label class="block text-[10px] font-black uppercase mb-1">Pelajar</label><select id="sel-student-hp3" onchange="loadStudentData('hp3')" class="w-full p-2 border rounded-lg font-bold" disabled></select></div>
-                            <div class="md:col-span-2"><input type="text" id="name-hp3" class="w-full p-3 bg-white border-2 rounded-xl font-black text-center" readonly placeholder="NAMA PELAJAR"></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-6 mb-6">
-                            <div class="text-center bg-green-50 p-4 rounded-2xl border-2 border-green-100">
-                                <label class="text-[10px] font-black uppercase text-green-700 block mb-2">Jumlah Balapan (25)</label>
-                                <input type="number" name="HP3_Total_Balapan" class="score-in-hp3 w-full p-4 border-2 rounded-2xl text-center font-black text-3xl text-green-800 focus:border-green-500 outline-none" max="25" step="0.01" placeholder="0">
-                            </div>
-                            <div class="text-center bg-emerald-50 p-4 rounded-2xl border-2 border-emerald-100">
-                                <label class="text-[10px] font-black uppercase text-emerald-700 block mb-2">Jumlah Padang (25)</label>
-                                <input type="number" name="HP3_Total_Padang" class="score-in-hp3 w-full p-4 border-2 rounded-2xl text-center font-black text-3xl text-emerald-800 focus:border-emerald-500 outline-none" max="25" step="0.01" placeholder="0">
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center bg-green-100 p-5 rounded-2xl">
-                            <p class="font-black text-green-900 uppercase">Jumlah Amali: <span id="total-hp3" class="text-3xl ml-2">0.0</span> / 50</p>
-                            <input type="hidden" name="ID_SISTEM" id="id-hp3"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp3"><input type="hidden" name="Kelas" id="class-hp3"><input type="hidden" name="Jumlah_HP3" id="val-total-hp3">
-                            <button type="submit" class="bg-green-600 text-white px-10 py-4 rounded-2xl font-black shadow-xl hover:bg-green-700 transition-all">SIMPAN DATA</button>
-                        </div>
-                    </form>
-                </div>
-            </section>
-
-            <section id="hp7" class="content-section">
-                <div class="bg-white p-6 rounded-2xl border shadow-sm max-w-2xl mx-auto">
-                    <h2 class="text-xl font-black mb-6 flex items-center gap-2 text-yellow-600"><i class="fas fa-tools"></i> HP7 (20%)</h2>
-                    <form id="form-hp7" onsubmit="handleFormSubmit(event, 'MARKAH_HP7')">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-slate-50 p-4 rounded-xl">
-                            <div><label class="block text-[10px] font-black uppercase mb-1">Kelas</label><select id="sel-class-hp7" onchange="filterStudents('hp7')" class="w-full p-2 border rounded-lg font-bold"></select></div>
-                            <div><label class="block text-[10px] font-black uppercase mb-1">Pelajar</label><select id="sel-student-hp7" onchange="loadStudentData('hp7')" class="w-full p-2 border rounded-lg font-bold" disabled></select></div>
-                            <div class="md:col-span-2"><input type="text" id="name-hp7" class="w-full p-3 bg-white border-2 rounded-xl font-black text-center" readonly placeholder="NAMA PELAJAR"></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 mb-6">
-                            <div class="text-center"><label class="text-[10px] font-black uppercase block mb-1">Trek (10)</label><input type="number" name="HP7_Penyediaan_Trek_10" class="score-in-hp7 w-full p-3 border-2 rounded-xl text-center font-black text-xl" max="10" step="0.01"></div>
-                            <div class="text-center"><label class="text-[10px] font-black uppercase block mb-1">Sektor (10)</label><input type="number" name="HP7_Penyediaan_Sektor_10" class="score-in-hp7 w-full p-3 border-2 rounded-xl text-center font-black text-xl" max="10" step="0.01"></div>
-                        </div>
-                        <div class="flex justify-between items-center bg-yellow-50 p-4 rounded-xl">
-                            <p class="font-black text-yellow-800">Jumlah: <span id="total-hp7" class="text-2xl">0</span></p>
-                            <input type="hidden" name="ID_SISTEM" id="id-hp7"><input type="hidden" name="Nama_Pelajar" id="hidden-name-hp7"><input type="hidden" name="Kelas" id="class-hp7"><input type="hidden" name="Jumlah_HP7" id="val-total-hp7">
-                            <button type="submit" class="bg-yellow-600 text-white px-8 py-3 rounded-xl font-black shadow-lg">SIMPAN</button>
-                        </div>
-                    </form>
-                </div>
-            </section>
-
-        </main>
-    </div>
-
-    <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJSoyfmId5JUQDgwqVE-6aMBLYLbQv6i5N5y7bC5SajqSjHPzt8UJUqbZ8a-LBTyd1/exec";
-        let currentUser = null;
-        let allStudents = [];
-        let existingScores = {};
-        let bellChart = null;
-
-        // UI Helpers
-        function nav(id) {
-            document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
-            document.getElementById(id).style.display = 'block';
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-50', 'text-blue-600', 'active'));
-            document.getElementById(`btn-${id}`).classList.add('bg-blue-50', 'text-blue-600', 'active');
-        }
-        function showToast(msg, type='success') {
-            const t = document.createElement('div'); t.className = `toast ${type} show`;
-            t.innerText = msg; document.getElementById('toast-container').appendChild(t);
-            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
-        }
-        function showLoader(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
-        function clean(v) { if(!v || v === "#N/A") return 0; return parseFloat(v) || 0; }
-
-        // Login
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault(); showLoader(true);
-            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email: document.getElementById('email').value, password: document.getElementById('password').value }) })
-            .then(res => res.json()).then(data => {
-                if(data.result === 'success') { currentUser = data.user; initApp(); }
-                else { showToast(data.message, 'error'); showLoader(false); }
-            });
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('loader').style.display = 'none';
+            if(data.result === 'success') {
+                document.getElementById('login-view').style.display = 'none';
+                document.getElementById('app-container').classList.remove('hidden');
+                alert("Selamat Datang, " + data.user.nama);
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(err => {
+            document.getElementById('loader').style.display = 'none';
+            alert("Gagal menyambung ke server. Sila pastikan URL /exec diletakkan dengan betul dalam satu baris.");
+            console.error(err);
         });
+    });
 
-        function initApp() {
-            document.getElementById('login-view').style.display = 'none';
-            document.getElementById('app-container').classList.remove('hidden');
-            document.getElementById('user-info').innerText = `${currentUser.nama} (${currentUser.role})`;
-            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'get_data', email: currentUser.email, role: currentUser.role }) })
-            .then(res => res.json()).then(d => {
-                allStudents = d.data.students; existingScores = d.data.scores;
-                initDropdowns('ujian'); initDropdowns('hp3'); initDropdowns('hp7');
-                updateDashboard();
-                showLoader(false);
-            });
-        }
+    // Auto-calc HP3
+    const b = document.getElementById('balapan-in');
+    const p = document.getElementById('padang-in');
+    const t = document.getElementById('total-hp3');
+    [b,p].forEach(el => el.addEventListener('input', () => {
+        t.innerText = (parseFloat(b.value || 0) + parseFloat(p.value || 0)).toFixed(1);
+    }));
+</script>
 
-        function logout() { location.reload(); }
-
-        function initDropdowns(s) {
-            const sel = document.getElementById(`sel-class-${s}`);
-            const classes = [...new Set(allStudents.map(p => p.Kelas))].sort();
-            sel.innerHTML = '<option value="">-- KELAS --</option>';
-            classes.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
-        }
-
-        function filterStudents(s) {
-            const cls = document.getElementById(`sel-class-${s}`).value;
-            const stu = document.getElementById(`sel-student-${s}`);
-            stu.innerHTML = '<option value="">-- PELAJAR --</option>';
-            if(!cls) { stu.disabled = true; return; }
-            stu.disabled = false;
-            allStudents.filter(p => p.Kelas === cls).forEach(p => {
-                const icon = (existingScores[s === 'ujian' ? 'MARKAH_UJIAN' : s === 'hp3' ? 'MARKAH_AMALI_HP3' : 'MARKAH_HP7']?.[p.ID_SISTEM]) ? '✅ ' : '';
-                stu.innerHTML += `<option value="${p.ID_SISTEM}">${icon}${p.Nama_Pelajar}</option>`;
-            });
-        }
-
-        function loadStudentData(s) {
-            const id = document.getElementById(`sel-student-${s}`).value;
-            if(!id) return;
-            const p = allStudents.find(x => x.ID_SISTEM == id);
-            document.getElementById(`name-${s}`).value = p.Nama_Pelajar;
-            document.getElementById(`id-${s}`).value = p.ID_SISTEM;
-            document.getElementById(`class-${s}`).value = p.Kelas;
-            document.getElementById(`hidden-name-${s}`).value = p.Nama_Pelajar;
-            
-            const sheet = s === 'ujian' ? 'MARKAH_UJIAN' : s === 'hp3' ? 'MARKAH_AMALI_HP3' : 'MARKAH_HP7';
-            const form = document.getElementById(`form-${s}`);
-            form.querySelectorAll('input[type=number]').forEach(i => i.value = '');
-            
-            if(existingScores[sheet]?.[id]) {
-                const d = existingScores[sheet][id];
-                if(s === 'ujian') { f(form, 'Bahagian_A', d[5]); f(form, 'Bahagian_B', d[6]); f(form, 'Bahagian_C', d[7]); }
-                if(s === 'hp3') { f(form, 'HP3_Total_Balapan', d[5]); f(form, 'HP3_Total_Padang', d[6]); }
-                if(s === 'hp7') { f(form, 'HP7_Penyediaan_Trek_10', d[5]); f(form, 'HP7_Penyediaan_Sektor_10', d[6]); }
-                showToast("Data dimuatkan.");
-            }
-            calculateTotal(s);
-        }
-        function f(form, name, v) { const i = form.querySelector(`[name="${name}"]`); if(i) i.value = v; }
-
-        // Calculation
-        document.querySelectorAll('input[type=number]').forEach(inp => {
-            inp.addEventListener('input', e => {
-                const s = e.target.closest('section').id;
-                calculateTotal(s);
-            });
-        });
-
-        function calculateTotal(s) {
-            let sum = 0;
-            const cls = s === 'ujian' ? '.score-in' : s === 'hp3' ? '.score-in-hp3' : '.score-in-hp7';
-            document.querySelectorAll(`#form-${s} ${cls}`).forEach(i => {
-                const v = clean(i.value); const m = clean(i.max);
-                if(v > m) i.value = m;
-                sum += clean(i.value);
-            });
-            document.getElementById(`total-${s}`).innerText = sum.toFixed(1);
-            document.getElementById(`val-total-${s}`).value = sum.toFixed(1);
-        }
-
-        function handleFormSubmit(e, sheet) {
-            e.preventDefault(); if(!confirm("Simpan?")) return; showLoader(true);
-            const data = {}; new FormData(e.target).forEach((v, k) => data[k] = v);
-            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'save_mark', sheetName: sheet, userEmail: currentUser.email, role: currentUser.role, formData: data }) })
-            .then(res => res.json()).then(res => {
-                if(res.result === 'success') { showToast("Berjaya!"); initApp(); }
-                else { showToast(res.message, 'error'); showLoader(false); }
-            });
-        }
-
-        function updateDashboard() {
-            document.getElementById('dash-total').innerText = allStudents.length;
-            let cu=0, ch3=0, ch7=0;
-            allStudents.forEach(p => {
-                const id = p.ID_SISTEM;
-                if(existingScores.MARKAH_UJIAN?.[id]) cu++;
-                if(existingScores.MARKAH_AMALI_HP3?.[id]) ch3++;
-                if(existingScores.MARKAH_HP7?.[id]) ch7++;
-            });
-            document.getElementById('dash-ujian').innerText = cu;
-            document.getElementById('dash-hp3').innerText = ch3;
-            document.getElementById('dash-hp7').innerText = ch7;
-
-            const fSel = document.getElementById('dash-filter-class');
-            fSel.innerHTML = '<option value="all">SEMUA KELAS</option>';
-            [...new Set(allStudents.map(p => p.Kelas))].sort().forEach(c => fSel.innerHTML += `<option value="${c}">${c}</option>`);
-            renderDashboardTable();
-
-            if(currentUser.role === 'ADMIN') {
-                document.getElementById('admin-analytics-area').classList.remove('hidden');
-                calculateStats();
-            }
-        }
-
-        function renderDashboardTable() {
-            const tbody = document.getElementById('dashboard-table-body');
-            const filt = document.getElementById('dash-filter-class').value;
-            tbody.innerHTML = '';
-            allStudents.filter(p => filt === 'all' || p.Kelas === filt).forEach(p => {
-                const id = p.ID_SISTEM;
-                const mU = existingScores.MARKAH_UJIAN?.[id];
-                const mH3 = existingScores.MARKAH_AMALI_HP3?.[id];
-                const mH7 = existingScores.MARKAH_HP7?.[id];
-                
-                // Ambil total dari kolum terakhir mengikut struktur baru
-                const valU = mU ? clean(mU[8]) : 0;
-                const valH3 = mH3 ? clean(mH3[7]) : 0;
-                const valH7 = mH7 ? clean(mH7[7]) : 0;
-                const total = valU + valH3 + valH7;
-                const done = (mU && mH3 && mH7);
-                
-                tbody.innerHTML += `<tr><td>${p.Nama_Pelajar}</td><td>${p.Kelas}</td><td class="text-center">${valU||'-'}</td><td class="text-center">${valH3||'-'}</td><td class="text-center">${valH7||'-'}</td><td class="text-center font-black text-blue-600">${total?total.toFixed(1):'-'}</td><td class="text-center">${done?'✅':'⏳'}</td></tr>`;
-            });
-        }
-
-        function calculateStats() {
-            const totals = [];
-            allStudents.forEach(p => {
-                const id = p.ID_SISTEM;
-                const valU = clean(existingScores.MARKAH_UJIAN?.[id]?.[8]);
-                const valH3 = clean(existingScores.MARKAH_AMALI_HP3?.[id]?.[7]);
-                const valH7 = clean(existingScores.MARKAH_HP7?.[id]?.[7]);
-                if(valU || valH3 || valH7) totals.push(valU + valH3 + valH7);
-            });
-            if(!totals.length) return;
-            const mean = totals.reduce((a,b)=>a+b,0)/totals.length;
-            const sd = Math.sqrt(totals.reduce((a,b)=>a+Math.pow(b-mean,2),0)/totals.length);
-            document.getElementById('stat-mean').innerText = mean.toFixed(2);
-            document.getElementById('stat-sd').innerText = sd.toFixed(2);
-            renderBell(mean, sd);
-        }
-
-        function renderBell(m, s) {
-            const ctx = document.getElementById('bellCurveChart');
-            const labels = [], data = [];
-            for(let x = m-(4*s); x <= m+(4*s); x += (8*s)/50) {
-                labels.push(x.toFixed(1));
-                data.push((1/(s*Math.sqrt(2*Math.PI))) * Math.exp(-0.5*Math.pow((x-m)/s, 2)));
-            }
-            if(bellChart) bellChart.destroy();
-            bellChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels, datasets: [{ data, borderColor: '#8b5cf6', fill: true, backgroundColor: 'rgba(139, 92, 246, 0.1)', tension: 0.4, pointRadius: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} }, scales: { y: {display:false}, x: { ticks: {font:{size:8}} } } }
-            });
-        }
-    </script>
 </body>
 </html>
